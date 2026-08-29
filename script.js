@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     window.__USE_PREVIEW_FLOW__ = true;
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyh6wVwLiPtQjdB4Hwx1CkrzvLz7OSqKIgGYDP4klNVpMq2TaeCzYIblvc7o2MQ4aIQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTPZLy9SpP3E3VgqN7tmHBVh91AYQmYpZQ_4Ryydea5IGTuo8-xp4m4ELdc0qAfeSY/exec";
 
     const MANOLOS_WHATSAPP_E164_NO_PLUS = "19802878716"; // <-- AJUSTAR SI HAY CAMBIO DE NUMERO
     const MANOLOS_PHONE_E164_PLUS       = "+19802878716"; // <-- AJUSTAR SI HAY CAMBIO DE NUMERO
