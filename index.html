@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manolo's Bakery - Pedidos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="language-switcher">
+                <button id="lang-es" class="lang-button active" data-lang="es">Español</button>
+                <button id="lang-en" class="lang-button" data-lang="en">English</button>
+                <button id="order-status-button" class="lang-button">How's my cake coming?</button>
+            </div>
+        </nav>
+        <h1 data-translate="bakeryPageTitle">Manolo's Bakery - Formulario de Pedido</h1>
+    </header>
+
+    <main>
+        <form id="cakeOrderForm">
+            <!-- Common Customer Information - Will be filled once -->
+           <div id="order-status-overlay" class="order-status-overlay" style="display:none;">
+           <div class="order-status-modal">
+           <button class="close-modal" id="closeStatusModal">&times;</button>
+           <h2>Track your cake order 🧁</h2>
+           <div class="form-group">
+           <label for="statusQuery">Order Number, Email or Name:</label>
+           <input type="text" id="statusQuery" placeholder="e.g. 20250721-001, email@example.com, Maria Lopez">
+           </div>
+           <div class="form-group">
+           <button type="button" id="checkStatusBtn">Check Status</button>
+           </div>
+           <div id="statusResult" class="notice" style="display:none;"></div>
+           </div>
+           </div>
+           <div id="confirmationActions" style="display:none; margin-top: 1.5rem;">
+           <button id="confirmOrderBtn" style="background-color: #4CAF50; color: white; border: none; padding: 10px 16px; border-radius: 6px; margin-right: 8px; cursor: pointer;">✅ Confirmar pedido</button>
+           <button id="cancelOrderBtn" style="background-color: #e53935; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer;">❌ Cancelar pedido</button>
+           <div id="cancelReasonContainer" style="margin-top: 1rem; display: none;">
+           <label for="cancelReason" style="font-weight: bold;">Motivo de cancelación:</label>
+           <input type="text" id="cancelReason" placeholder="Ej. Ya no lo necesito" style="width:100%; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px;">
+           <button id="submitCancelBtn" style="margin-top: 10px; background-color: #d32f2f; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer;">Enviar cancelación</button>
+           </div>  
+           </div>
+
+            <div class="form-section customer-info">
+                <h2 data-translate="customerInfoTitle">Información del Cliente</h2>
+                <div class="form-group">
+                    <label for="customerName" data-translate="customerNameLabel">Nombre del Cliente:</label>
+                    <input type="text" id="customerName" name="customerName" required>
+                </div>
+                <div class="form-group">
+                <label for="phone" data-translate="phoneLabel">Teléfono:</label>
+                  <input type="tel" id="phone" name="phone" inputmode="numeric" pattern="[0-9]+" maxlength="15" required>
+                </div>
+                <div class="form-group">
+                    <label for="email" data-translate="emailLabel">Correo Electrónico:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryMethod" data-translate="deliveryMethodLabel">¿Cómo deseas recibirlo?</label>
+                    <select id="deliveryMethod" name="deliveryMethod">
+                        <option value="pickup" selected data-translate="deliveryMethodPickup">Recoger en la pastelería</option>
+                        <option value="home" disabled data-translate="deliveryMethodHome">Domicilio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="orderDate" data-translate="orderDateLabel">Fecha de Pedido:</label>
+                    <input type="text" id="orderDate" name="orderDate" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryDate" data-translate="deliveryDateLabel">Fecha de Entrega (MM/DD/AAAA):</label>
+                    <input type="text" id="deliveryDate" name="deliveryDate" placeholder="MM/DD/AAAA" required>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryTimeInput" data-translate="deliveryTimeLabel">Hora de Entrega/Recogida:</label>
+                    <div class="delivery-time-picker">
+                        <input type="time" id="deliveryTimeInput" step="60" aria-label="Hora exacta" required>
+                        <select id="deliveryMeridiem" aria-label="AM o PM" required>
+                            <option value="">AM/PM</option>
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
+                    <small class="field-hint">Selecciona la hora exacta y si corresponde a AM o PM.</small>
+                    <!-- Valor normalizado que se envía al servidor, por ejemplo: 03:30 PM -->
+                    <input type="hidden" id="deliveryTime" name="deliveryTime" required>
+
+                <div class="form-group">
+                    <label for="customerNameEmpleado" data-translate="customerNameEmpleado">ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ</label>
+                    <input type="text"id="customerNameEmpleado" name="customerNameEmpleado" class="form-control" placeholder="Orden hecha por:"> 
+                    <small class="field-hint"> Este campo es solo para empleados de Manolo's Latin Bakery.</small> </div>
+                </div>
+                 <div class="form-group">
+                    <label data-translate="contactPreferenceLabel">¿Cómo prefieres ser contactado?</label>
+                    <div class="contact-options">
+                        <div>
+                            <input type="radio" id="contact-whatsapp" name="contactMethod" value="whatsapp" disabled>
+                            <label for="contact-whatsapp" data-translate="whatsappLabel">WhatsApp</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="contact-email" name="contactMethod" value="email">
+                            <label for="contact-email" data-translate="emailContactLabel">Correo Electrónico</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="contact-sms" name="contactMethod" value="sms" disabled>
+                            <label for="contact-sms" data-translate="smsLabel"> SMS <span class="sms-hint">(Pronto estará disponible la confirmación por SMS)</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" id="contact-phonecall" name="contactMethod" value="phonecall" disabled>
+                            <label for="contact-phonecall" data-translate="phoneCallLabel">Llamada Telefónica</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="tabs">
+                <button type="button" class="tab-button active" data-translate="showcaseCakeTab" onclick="openCakeSection(event, 'showcase')">Pastel de Vitrina</button>
+                <button type="button" class="tab-button" data-translate="customCakeTab" onclick="openCakeSection(event, 'custom')">Pastel Personalizado</button>
+            </div>
+
+<!-- Showcase Cake Section -->
+<div id="showcase" class="form-section cake-section">
+    <h3 data-translate="showcaseCakeTitle">Pasteles de Vitrina</h3>
+                <!-- Specific fields for showcase cakes -->
+                <div class="form-group">
+                    <label for="sc-cake-select" data-translate="selectShowcaseCakeLabel">Selecciona un Pastel:</label>
+                    <select id="sc-cake-select" name="showcaseCake">
+                        <option value="" data-translate="selectOptionDefault">-- Selecciona --</option>
+                        <option value="churros_tres_leches" data-translate="churrosTresLechesCake">Pastel Churros Tres Leches</option>
+                        <option value="nutella_tres_leches" data-translate="nutellaTresLechesCake">Pastel de Nutella Tres Leches</option>
+                        <option value="plain_tres_leches" data-translate="plainTresLechesCake">Pastel Plain Tres Leches</option>
+                        <option value="caramelo_tres_leches" data-translate="carameloTresLechesCake">Pastel Caramelo Tres Leches</option>
+                        <option value="melocoton_chocolate_oscuro_tres_leches" data-translate="peachDarkChocolateTresLechesCake">Pastel Melocotón Chocolate Oscuro Tres Leches</option>
+                        <option value="melocoton_chocolate_blanco_tres_leches" data-translate="peachWhiteChocolateTresLechesCake">Pastel Melocotón Chocolate Blanco Tres Leches</option>
+                        <option value="cheerwine_tres_leches" data-translate="cheerwineTresLechesCake">Pastel Cheerwine Tres Leches</option>
+                        <option value="nuez_tres_leches" data-translate="pecanTresLechesCake">Pastel Nuez Tres Leches</option>
+                        <option value="chocolate_tres_leches" data-translate="chocolateTresLechesCake">Pastel Chocolate Tres Leches</option>
+                        <option value="moca_cake" data-translate="mocaCake">Pastel Moca</option>
+                        <option value="red_velvet_cake" data-translate="redVelvetCake">Pastel Red Velvet</option>
+                        <option value="maracuya_cake" data-translate="passionFruitCake">Pastel Maracuya</option>
+                        <option value="torta_chilena_10_inch" data-translate="chileanCake10Inch">Pastel Torta Chilena (solo 10")</option>
+                        <option value="pastel_amor_10_inch" data-translate="loveCake10Inch">Pastel Amor (solo 10")</option>
+                        <option value="cheesecake_oreo_10_inch" data-translate="oreoCheesecake10Inch">Cheesecake Oreo (solo 10")</option>
+                        <option value="cheesecake_fresa_10_inch" data-translate="strawberryCheesecake10Inch">Cheesecake Fresa (solo 10")</option>
+                        <option value="cheesecake_caramelo_10_inch" data-translate="caramelCheesecake10Inch">Cheesecake Caramelo (solo 10")</option>
+                        <option value="cheesecake_plain_10_inch" data-translate="plainCheesecake10Inch">Cheesecake (solo 10")</option>
+                        <option value="flan_10_inch" data-translate="flan10Inch">Flan (solo 10")</option>
+                        <option value="chocoflan_10_inch" data-translate="chocoflan10Inch">Chocoflan (solo 10")</option>
+                        <option value="tiramisu_10_inch" data-translate="tiramisu10Inch">Tiramisu (solo 10")</option>
+                        <option value="lemon_pie_10_inch" data-translate="lemonPie10Inch">Lemon Pie (solo 10")</option>
+                        <option value="pandebono_cake_10_inch" data-translate="pandebonoCake10Inch">Pandebono Cake (solo 10")</option>
+                        <option value="brownie_gluten_free_vegan" data-translate="veganGlutenFreeBrownie">Brownie Sin Gluten Vegano (solo 7" y 9.5")</option>
+                    </select>
+                </div>
+    <!-- Tamaño -->
+    <div class="form-group">
+        <label for="sc-cakeSize" data-translate="cakeSizeLabel">Tamaño:</label>
+        <select id="sc-cakeSize" name="showcaseCakeSize">
+            <option value="" data-translate="selectSizeOptionDefault">-- Selecciona Tamaño --</option>
+            <option value="6" data-translate="size6Inch">6"</option>
+            <option value="8" data-translate="size8Inch">8"</option>
+            <option value="10" data-translate="size10Inch">10"</option>
+            <option value="12" data-translate="size12Inch">12"</option>
+            <option value="14" data-translate="size14Inch">14"</option>
+        </select>
+    </div>
+
+    <!-- Comentarios -->
+    <div class="form-group">
+        <label for="sc-comments" data-translate="commentsLabel">Comentarios o Sugerencias:</label>
+        <textarea id="sc-comments" name="showcaseComments" rows="3"></textarea>
+    </div>
+
+    <!-- Mensaje en el pastel (para vitrina) -->
+    <div class="form-group">
+        <label for="sc-cakeMessage" data-translate="customCakeMessageLabel">Mensaje en el pastel:</label>
+        <textarea id="sc-cakeMessage" name="showcaseCakeMessage" rows="3"></textarea>
+
+        <div id="sc-message-options-group" class="message-options-group" style="display:none;">
+            <!-- Ubicación -->
+            <div class="form-group">
+                <label data-translate="messageLocationLabel">Ubicación del mensaje:</label>
+                <div class="contact-options">
+                    <div>
+                        <input type="radio" id="sc-message-location-wall" name="sc-messageLocation" value="wall">
+                        <label for="sc-message-location-wall" data-translate="messageLocationWall">Pared</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="sc-message-location-top" name="sc-messageLocation" value="top">
+                        <label for="sc-message-location-top" data-translate="messageLocationTop">Tapa</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color de Letra -->
+            <div class="form-group">
+                <label for="sc-message-color" data-translate="messageColorLabel">Color de letra:</label>
+                <select id="sc-message-color" name="sc-messageColor">
+                    <option value="" data-translate="selectToneOptionDefault">-- Selecciona Tono --</option>
+                    <option value="claro" data-translate="toneLight">Claro</option>
+                    <option value="oscuro" data-translate="toneDark">Oscuro</option>
+                </select>
+                <div id="sc-message-color-spec-group" class="decoration-sub-option" style="display:none;">
+                    <label for="sc-message-color-spec" data-translate="specifyMessageColorLabel">Especificar color de letra:</label>
+                    <input type="text" id="sc-message-color-spec" name="sc-messageColorSpec">
+                </div>
+            </div>
+
+            <!-- Tipo de Letra -->
+            <div class="form-group">
+                <label for="sc-message-font" data-translate="messageFontLabel">Tipo de letra:</label>
+                <select id="sc-message-font" name="sc-messageFont">
+                    <option value="" data-translate="selectFontOptionDefault">-- Selecciona Tipo --</option>
+                    <option value="cursive" data-translate="fontCursive">Cursiva</option>
+                    <option value="normal" data-translate="fontNormal">Normal</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+            <!-- Custom Cake Section -->
+            <div id="custom" class="form-section cake-section" style="display:none;">
+                <h3 data-translate="customCakeTitle">Pasteles Personalizados</h3>
+                <!-- Specific fields for custom cakes -->
+                <div class="form-group">
+                    <label for="cc-cakeSize" data-translate="customShapeAndSizeLabel">Forma y Tamaño:</label>
+                    <select id="cc-cakeSize" name="customCakeSize">
+                        <option value="" data-translate="selectSizeOptionDefault">-- Selecciona Forma y Tamaño --</option>
+                        <option value="circular_6" data-translate="circular6Inch">Circular 6"</option>
+                        <option value="circular_8" data-translate="circular8Inch">Circular 8"</option>
+                        <option value="circular_10" data-translate="circular10Inch">Circular 10"</option>
+                        <option value="circular_12" data-translate="circular12Inch">Circular 12"</option>
+                        <option value="circular_14" data-translate="circular14Inch">Circular 14"</option>
+                        <option value="cuadrado_1_4" data-translate="squareQuarterSheet">Cuadrado 1/4 Sheet</option>
+                        <option value="rectangular_1_2" data-translate="rectangularHalfSheet">Rectangular 1/2 Sheet</option>
+                        <option value="Sheet (Plancha Completa)" data-translate="sizeSheetInch">Sheet (Plancha Completa)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cc-cakeType" data-translate="customCakeTypeLabel">Tipo de Pastel:</label>
+                    <select id="cc-cakeType" name="customCakeType">
+                        <option value="" data-translate="selectTypeOptionDefault">-- Selecciona Tipo --</option>
+                        <option value="tres_leches_vainilla" data-translate="cakeTypeTresLechesVanilla">Tres Leches / Vainilla</option>
+                        <option value="tres_leches_chocolate" data-translate="cakeTypeTresLechesChocolate">Tres Leches / Chocolate</option>
+                        <option value="vainilla_seco" data-translate="cakeTypeVanillaDry">Vainilla Seco</option>
+                        <option value="chocolate_seco" data-translate="cakeTypeChocolateDry">Chocolate Seco</option>
+                        <option value="marmolado" data-translate="cakeTypeMarble">Marmolado</option>
+                        <option value="mocca" data-translate="cakeTypeMocha">Mocca</option>
+                        <option value="maracuya" data-translate="cakeTypePassionFruit">Maracuyá</option>
+                        <option value="otro" data-translate="cakeTypeOther">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group" id="cc-otherCakeTypeGroup" style="display:none;">
+                    <label for="cc-otherCakeType" data-translate="customOtherCakeTypeLabel">Especifica otro tipo de pastel:</label>
+                    <input type="text" id="cc-otherCakeType" name="customOtherCakeType">
+                </div>
+                <div class="form-group">
+
+                                <h3 data-translate="specialDesignTitle" class="section-title">Diseño Especial:</h3>
+
+                    <label for="cc-flavor" data-translate="customLayersLabel">Capas del pastel.</label>
+                    <select id="cc-flavor" name="cc-flavor" data-translate-placeholder>
+                    <option value="" disabled selected data-translate="selectLayersPlaceholder">Selecciona una opción</option>
+                    <option value="0">Sin Capas - No layers</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    </select>
+                    </div>
+
+                <div class="form-group">
+                <label for="heart-shape" data-translate="heartShapeLabel">¿Forma de corazón?</label>
+                <select id="heart-shape" name="heartShape" data-translate-placeholder>
+                <option value="" disabled selected data-translate="selectHeartPlaceholder">Selecciona una opción</option>
+                <option value="yes" data-translate="optionYes">Sí</option>
+                <option value="no" data-translate="optionNo">No</option>
+                </select>
+                </div>
+            
+                <div class="form-group">
+                <label for="with-photo" data-translate="withPhotoLabel">Con foto:</label>
+                <select id="with-photo" name="withPhoto" data-translate-placeholder>
+                <option value="" disabled selected data-translate="selectPhotoPlaceholder">Selecciona una opción</option>
+                <option value="yes" data-translate="optionYes">Sí</option>
+                <option value="no" data-translate="optionNo">No</option>
+                </select>
+                </div>
+            
+                <div class="form-group">
+                <label for="design-image" data-translate="designImageLabel">Con imagen de díseño:</label>
+                <select id="design-image" name="designImage" data-translate-placeholder>
+                <option value="" disabled selected data-translate="selectDesignPlaceholder">Selecciona una opción</option>
+                <option value="yes" data-translate="optionYes">Sí</option>
+                <option value="no" data-translate="optionNo">No</option>
+                </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-translate="customFillingsLabel">Rellenos: (Selecciona al menos 1)</label>
+                    <div class="checkbox-group" id="cc-fillings-group">
+                        <div><input type="checkbox" id="filling-peach" name="customFilling" value="peach"><label for="filling-peach" data-translate="fillingPeach">Durazno</label></div>
+                        <div><input type="checkbox" id="filling-walnut" name="customFilling" value="walnut"><label for="filling-walnut" data-translate="fillingWalnut">Nuez</label></div>
+                        <div><input type="checkbox" id="filling-chocolate-chips" name="customFilling" value="chocolate_chips"><label for="filling-chocolate-chips" data-translate="fillingChocolateChips">Chocolate Chips</label></div>
+                        <div><input type="checkbox" id="filling-mocha" name="customFilling" value="mocha"><label for="filling-mocha" data-translate="fillingMocha">Mocca</label></div>
+                        <div><input type="checkbox" id="filling-cherry" name="customFilling" value="cherry"><label for="filling-cherry" data-translate="fillingCherry">Cereza</label></div>
+                        <div><input type="checkbox" id="filling-strawberry-natural" name="customFilling" value="strawberry_natural"><label for="filling-strawberry-natural" data-translate="fillingStrawberryNatural">Fresa Natural</label></div>
+                        <div><input type="checkbox" id="filling-strawberry-jam" name="customFilling" value="strawberry_jam"><label for="filling-strawberry-jam" data-translate="fillingStrawberryJam">Fresa Mermelada</label></div>
+                        <div><input type="checkbox" id="filling-chocolate-dry" name="customFilling" value="chocolate_dry"><label for="filling-chocolate-dry" data-translate="fillingChocolateDry">Chocolate Seco</label></div>
+                        <div><input type="checkbox" id="filling-pineapple-jam" name="customFilling" value="pineapple_jam"><label for="filling-pineapple-jam" data-translate="fillingPineappleJam">Piña Mermelada</label></div>
+                        <div><input type="checkbox" id="filling-caramel" name="customFilling" value="caramel"><label for="filling-caramel" data-translate="fillingCaramel">Caramelo</label></div>
+                        <div><input type="checkbox" id="filling-nutella" name="customFilling" value="nutella"><label for="filling-nutella" data-translate="fillingNutella">Nutella</label></div>
+                        <div><input type="checkbox" id="filling-pistachio" name="customFilling" value="pistachio"><label for="filling-pistachio" data-translate="fillingPistachio">Pistacho</label></div>
+                        <div><input type="checkbox" id="filling-other" name="customFilling" value="other"><label for="filling-other">Otro</label></div>
+                        <div id="other-filling-container" style="display:none; margin-top:10px;"><input type="text" id="other-filling-input" placeholder="Especifica otro relleno..." style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"></div>
+                    </div>
+                    <div id="selected-fillings-display" data-translate="selectedFillingsTextPlaceholder" class="selected-fillings-info">Seleccionados: Ninguno</div>
+                </div>
+                <div class="form-group" id="cc-fillingArrangementGroup" style="display:none;">
+    
+    <label data-translate="customFillingArrangementLabel">¿Cómo deseas los rellenos?</label>
+
+    <div>
+        <input type="radio" id="filling-mixeado" name="customFillingArrangement" value="mixeado">
+        <label for="filling-mixeado" data-translate="fillingArrangementMixed">Mixeado</label>
+    </div>
+
+    <div>
+        <input type="radio" id="filling-mitad-mitad" name="customFillingArrangement" value="mitad_mitad">
+        <label for="filling-mitad-mitad" data-translate="fillingArrangementHalfHalf">Mitad y Mitad</label>
+    </div>
+
+    <!-- NUEVO -->
+    <div>
+        <input type="radio" id="filling-otro-arrangement" name="customFillingArrangement" value="otro">
+        <label for="filling-otro-arrangement">Otro (especificar)</label>
+    </div>
+
+    <!-- INPUT OCULTO -->
+    <div id="cc-otroArrangementContainer" style="display:none; margin-top:8px;">
+        <input 
+            type="text" 
+            id="cc-otroArrangementInput" 
+            placeholder="Ej: En capas alternadas, centro relleno diferente..."
+            style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"
+        >
+    </div>
+
+</div>
+                <div class="form-group" id="cc-halfAndHalfSpecificationGroup" style="display:none;">
+                    <label for="cc-half1Fillings" data-translate="customHalf1FillingsLabel">Rellenos Mitad 1:</label>
+                    <input type="text" id="cc-half1Fillings" name="customHalf1Fillings">
+                    <label for="cc-half2Fillings" data-translate="customHalf2FillingsLabel">Rellenos Mitad 2:</label>
+                    <input type="text" id="cc-half2Fillings" name="customHalf2Fillings">
+                </div>
+                <fieldset class="form-group decoration-fieldset">
+                    <legend data-translate="customDecorationDetailsLabel">Detalles de Decoración</legend>
+                    <div class="decoration-options-group">
+                        <!-- Cierres Arriba -->
+                        <div class="decoration-option">
+                            <input type="checkbox" id="dec-top-closures" name="decTopClosures" value="true">
+                            <label for="dec-top-closures" data-translate="decTopClosuresLabel">Con cierres arriba</label>
+                        </div>
+                        <div id="dec-top-closures-tone-group" class="decoration-sub-option" style="display:none;">
+                            <label for="dec-top-closures-tone" data-translate="decTopClosuresToneLabel">Tono de cierre arriba:</label>
+                            <select id="dec-top-closures-tone" name="decTopClosuresTone">
+                                <option value="" data-translate="selectToneOptionDefault">-- Selecciona Tono --</option>
+                                <option value="claro" data-translate="toneLight">Claro</option>
+                                <option value="oscuro" data-translate="toneDark">Oscuro</option>
+                            </select>
+                            <div id="dec-top-closures-color-spec-group" class="decoration-sub-option" style="display:none;">
+                                <label for="dec-top-closures-color-spec" data-translate="specifyColorLabel">Especificar color:</label>
+                                <input type="text" id="dec-top-closures-color-spec" name="decTopClosuresColorSpec">
+                            </div>
+                        </div>
+                        <!-- Cierres Abajo -->
+                        <div class="decoration-option">
+                            <input type="checkbox" id="dec-bottom-closures" name="decBottomClosures" value="true">
+                            <label for="dec-bottom-closures" data-translate="decBottomClosuresLabel">Con cierres abajo</label>
+                        </div>
+                        <div id="dec-bottom-closures-tone-group" class="decoration-sub-option" style="display:none;">
+                            <label for="dec-bottom-closures-tone" data-translate="decBottomClosuresToneLabel">Tono de cierre abajo:</label>
+                            <select id="dec-bottom-closures-tone" name="decBottomClosuresTone">
+                                <option value="" data-translate="selectToneOptionDefault">-- Selecciona Tono --</option>
+                                <option value="claro" data-translate="toneLight">Claro</option>
+                                <option value="oscuro" data-translate="toneDark">Oscuro</option>
+                            </select>
+                            <div id="dec-bottom-closures-color-spec-group" class="decoration-sub-option" style="display:none;">
+                                <label for="dec-bottom-closures-color-spec" data-translate="specifyColorLabel">Especificar color:</label>
+                                <input type="text" id="dec-bottom-closures-color-spec" name="decBottomClosuresColorSpec">
+                            </div>
+                        </div>
+                        <!-- Rosetones -->
+                        <div class="decoration-option">
+                            <input type="checkbox" id="dec-rosettes" name="decRosettes" value="true">
+                            <label for="dec-rosettes" data-translate="decRosettesLabel">Con rosetones</label>
+                        </div>
+                        <div id="dec-rosettes-tone-group" class="decoration-sub-option" style="display:none;">
+                            <label for="dec-rosettes-tone" data-translate="decRosettesToneLabel">Tono de Rosetones:</label>
+                            <select id="dec-rosettes-tone" name="decRosettesTone">
+                                <option value="" data-translate="selectToneOptionDefault">-- Selecciona Tono --</option>
+                                <option value="claro" data-translate="toneLight">Claro</option>
+                                <option value="oscuro" data-translate="toneDark">Oscuro</option>
+                            </select>
+                            <div id="dec-rosettes-color-spec-group" class="decoration-sub-option" style="display:none;">
+                                <label for="dec-rosettes-color-spec" data-translate="specifyColorLabel">Especificar color:</label>
+                                <input type="text" id="dec-rosettes-color-spec" name="decRosettesColorSpec">
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    <label for="cc-cakeMessage" data-translate="customCakeMessageLabel">Mensaje en el pastel:</label>
+                    <textarea id="cc-cakeMessage" name="customCakeMessage" rows="3"></textarea>
+                    <div id="cc-message-options-group" class="message-options-group" style="display:none;">
+                        <!-- Ubicación -->
+                        <div class="sub-form-group">
+                            <label data-translate="messageLocationLabel">Ubicación del mensaje:</label>
+                            <div class="contact-options">
+                                <div>
+                                    <input type="radio" id="message-location-wall" name="messageLocation" value="wall">
+                                    <label for="message-location-wall" data-translate="messageLocationWall">Pared</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="message-location-top" name="messageLocation" value="top">
+                                    <label for="message-location-top" data-translate="messageLocationTop">Tapa</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Color de Letra -->
+                        <div class="sub-form-group">
+                            <label for="message-color" data-translate="messageColorLabel">Color de letra:</label>
+                            <select id="message-color" name="messageColor">
+                                <option value="" data-translate="selectToneOptionDefault">-- Selecciona Tono --</option>
+                                <option value="claro" data-translate="toneLight">Claro</option>
+                                <option value="oscuro" data-translate="toneDark">Oscuro</option>
+                            </select>
+                            <div id="message-color-spec-group" class="decoration-sub-option" style="display:none;">
+                                <label for="message-color-spec" data-translate="specifyMessageColorLabel">Especificar color de letra:</label>
+                                <input type="text" id="message-color-spec" name="messageColorSpec">
+                            </div>
+                        </div>
+                        <!-- Tipo de Letra -->
+                        <div class="sub-form-group">
+                            <label for="message-font" data-translate="messageFontLabel">Tipo de letra:</label>
+                            <select id="message-font" name="messageFont">
+                                <option value="" data-translate="selectFontOptionDefault">-- Selecciona Tipo --</option>
+                                <option value="cursive" data-translate="fontCursive">Cursiva</option>
+                                <option value="normal" data-translate="fontNormal">Normal</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cc-image" data-translate="referenceImageLabel">Imagen de Referencia (opcional):</label>
+                    <input type="file" id="cc-image" name="customCakeImage" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="cc-comments" data-translate="commentsLabel">Comentarios o Sugerencias Adicionales:</label>
+                    <textarea id="cc-comments" name="customComments" rows="3"></textarea>
+                </div>
+                <p class="info" data-translate="customCakeNotice">Los pasteles personalizados requieren al menos 12 horas de anticipación.</p>
+            </div>
+            
+            <input type="hidden" id="cakeType" name="cakeType" value="showcase"> <!-- Hidden field to know which section is active -->
+
+            <button type="submit" id="submitOrderBtn" data-translate="submitButton">Enviar Pedido</button>
+        </form>
+    </main>
+
+<footer class="site-footer">
+    <p class="footer-brand">© 2022 Manolo´s Latin Bakery hecho con 💛 en Charlotte, NC</p>
+    <nav class="footer-links">
+      <a href="#">Política de Privacidad</a> |
+      <a href="#" id="termsLink">Términos de Servicio</a> |
+      <a href="mailto:cakes@manolosbakery.com">Contáctanos</a>
+    </nav>
+</footer>
+
+<!-- ===== Modal: Términos y Condiciones (solo lectura) ===== -->
+<div id="termsOverlay" style="display:none;">
+  <div id="termsDialog" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <div class="terms-header">
+      <h3 id="termsTitle">Términos y Condiciones</h3>
+      <button id="termsCloseBtn" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div id="termsBody" class="terms-body"><!-- contenido se inyecta por JS --></div>
+    <div class="terms-footer">
+      <button id="termsCloseBtn2" type="button">Cerrar</button>
+    </div>
+  </div>
+</div>
+<!-- ===== /Modal ===== -->    
+
+    <script src="script.js"></script>
+
+    <!-- Order Preview Modal -->
+    <div id="orderPreviewModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h3 data-translate="previewTitle">Revisa Tu Pedido</h3>
+            <div id="previewOrderDetails" class="order-details-preview">
+                <!-- Order details will be populated here by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="confirmOrderBtn" class="button-primary" data-translate="confirmOrderBtn">Confirmar Pedido</button>
+                <button type="button" id="cancelPreviewBtn" class="button-secondary" data-translate="cancelPreviewBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

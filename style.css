@@ -1,0 +1,593 @@
+:root {
+    --contrast: #222222;
+    --contrast-2: #333333; /* Slightly lighter for text on dark backgrounds if needed */
+    --contrast-3: #7a7676;
+    --base: #edebeb;
+    --base-2: #fcfbfa;
+    --base-3: #ffffff;
+    --accent: #807a7a;
+    --accent-hover: #6c6666; /* Darker shade for hover */
+    --global-color-9: #fbb712; /* Gold/Yellow */
+    --global-color-10: #18b5ac; /* Teal */
+    --global-color-11: #f05c51; /* Coral Red */
+    --global-color-12: #920a08; /* Deep Red */
+    --global-color-13: #e3e3e3; /* Light Grey */
+
+    --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --border-radius: 5px;
+    --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: var(--font-family-main);
+    background-color: var(--base);
+    color: var(--contrast);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+header {
+    background-color: var(--contrast);
+    color: var(--base-2);
+    padding: 1rem 2rem;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    color: var(--global-color-9); /* Gold title */
+}
+
+.language-switcher {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+}
+
+.lang-button {
+    background-color: var(--accent);
+    color: var(--base-2);
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    transition: background-color 0.3s ease;
+}
+
+.lang-button:hover, .lang-button.active {
+    background-color: var(--global-color-9);
+    color: var(--contrast);
+}
+
+main {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--base-2);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-section {
+    background-color: var(--base-3);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--global-color-13);
+}
+
+.form-section h2, .form-section h3 {
+    color: var(--contrast-2);
+    margin-top: 0;
+    border-bottom: 2px solid var(--global-color-9);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.customer-info h2 {
+    border-bottom-color: var(--global-color-10); /* Teal for customer info */
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--contrast-3);
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--global-color-13);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    background-color: var(--base-3);
+    color: var(--contrast-2);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="email"]:focus,
+/* input[type="date"]:focus, Removed date input from this group */
+textarea:focus,
+select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 5px rgba(128, 122, 122, 0.5); /* Accent color shadow */
+    outline: none;
+}
+
+/* Specific styling for date input to try and match others - REMOVED */
+/*
+input[type="date"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--global-color-13);
+    border-radius: var(--border-radius);
+    box-sizing: border-box;
+    background-color: var(--base-3);
+    color: var(--contrast-2);
+    font-family: var(--font-family-main); 
+    font-size: 1rem; 
+    line-height: 1.6; 
+    min-height: calc(0.75rem * 2 + 1.6em + 2px); 
+}
+*/
+
+/* Attempt to style the calendar picker indicator for WebKit browsers - REMOVED */
+/*
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-color: var(--accent);
+    padding: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+*/
+
+input[readonly] {
+    background-color: var(--base);
+    cursor: not-allowed;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.contact-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.contact-options div {
+    display: flex;
+    align-items: center;
+}
+
+.contact-options input[type="radio"],
+.contact-options input[type="checkbox"] { /* For future if you change to checkbox */
+    margin-right: 0.5rem;
+    accent-color: var(--accent);
+}
+
+hr {
+    border: none;
+    border-top: 1px dashed var(--contrast-3);
+    margin: 2rem 0;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem; /* Space between tab buttons */
+    margin-bottom: 1rem; /* Space below the tabs */
+    border-bottom: 2px solid var(--accent);
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border: none;
+    background-color: var(--base);
+    color: var(--contrast-3);
+    border-radius: var(--border-radius) var(--border-radius) 0 0; /* Rounded top corners */
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.tab-button:hover {
+    background-color: var(--accent-hover);
+    color: var(--base-2);
+}
+
+.tab-button.active {
+    background-color: var(--accent);
+    color: var(--base-2);
+    border-bottom: 2px solid var(--accent); /* Visually connect to content */
+}
+
+.cake-section {
+    /* border-top: none; */ /* Remove top border as tabs provide separation */
+}
+
+#showcase, #custom {
+    /* Styles specific to these sections if needed beyond .form-section */
+}
+
+.info {
+  background-color: #f0f4ff; /* azul muy suave */
+  color: #1a1a1a; /* texto oscuro */
+  padding: 10px 15px;
+  border-left: 4px solid #4a90e2; /* barra lateral para destacar */
+  border-radius: 5px;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
+}
+
+
+button[type="submit"] {
+    background-color: var(--global-color-10); /* Teal submit button */
+    color: var(--base-2);
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: block;
+    margin: 1rem auto 0; /* Center the button */
+    min-width: 200px;
+}
+
+button[type="submit"]:hover {
+    background-color: #15a097; /* Darker teal */
+    transform: translateY(-2px);
+}
+
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: var(--contrast);
+    color: var(--base);
+    font-size: 0.9rem;
+    margin-top: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        padding: 1rem;
+    }
+    header h1 {
+        font-size: 1.8rem;
+    }
+    .language-switcher {
+        position: static;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    main {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    .tabs {
+        flex-direction: column; /* Stack tabs vertically on smaller screens */
+    }
+    .tab-button {
+        width: 100%;
+        border-radius: var(--border-radius); /* Full rounded corners when stacked */
+        margin-bottom: 0.25rem;
+    }
+    .tab-button.active {
+         border-radius: var(--border-radius);
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    button[type="submit"] {
+        width: 100%;
+    }
+}
+
+/* Decoration Fieldset Styles */
+.decoration-fieldset {
+    border: 1px solid var(--global-color-13);
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+}
+
+.decoration-fieldset legend {
+    padding: 0 0.5rem;
+    font-weight: bold;
+    color: var(--contrast-3);
+}
+
+.decoration-options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.decoration-sub-option {
+    padding-left: 1.5rem; /* Indent sub-options */
+}
+
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex; /* ใช้ flexbox дляจัดกลาง */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+    opacity: 0; /* Start hidden for transition */
+    visibility: hidden; /* Start hidden for transition */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--base-2);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 600px; /* Max width of modal */
+    max-height: 80vh; /* Max height */
+    overflow-y: auto; /* Scroll if content is too long */
+    transform: scale(0.9); /* Start smaller for transition */
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: var(--contrast);
+    border-bottom: 1px solid var(--global-color-13);
+    padding-bottom: 0.5rem;
+}
+
+.order-details-preview {
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.order-details-preview p {
+    margin: 0.5rem 0;
+}
+.order-details-preview strong {
+    color: var(--contrast-2);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.modal-actions button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.modal-actions .button-primary {
+    background-color: var(--global-color-10); /* Teal */
+    color: var(--base-2);
+}
+.modal-actions .button-primary:hover {
+    background-color: #15a097; /* Darker teal */
+}
+
+.modal-actions .button-secondary {
+    background-color: var(--accent);
+    color: var(--base-2);
+}
+.modal-actions .button-secondary:hover {
+    background-color: var(--accent-hover);
+}
+
+.notice {
+  background: #f9f9f9;
+  border-left: 4px solid #4CAF50;
+  padding: 12px;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
+.order-status-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.65);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.order-status-modal {
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+
+#checkStatusBtn {
+  background: linear-gradient(to right, #ff7096, #ff94b8);
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  box-shadow: 0 4px 10px rgba(255, 112, 150, 0.3);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#checkStatusBtn:hover {
+  background: linear-gradient(to right, #ff5e8c, #ff82aa);
+  transform: scale(1.03);
+}
+
+.site-footer {
+  margin-top: 40px;
+  padding: 18px 12px;
+  background: #111;              /* negro */
+  border-top: 1px solid #222;    /* línea sutil */
+  text-align: center;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.footer-brand {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.footer-links {
+  margin-top: 6px;
+  font-size: 12.5px;
+}
+
+.footer-links a {
+  color: #bbb;
+  text-decoration: none;
+  margin: 0 6px;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: #f4c542;                /* dorado marca */
+}
+
+.social-links {
+  margin-top: 8px;
+}
+
+.social-links a img {
+  width: 20px;
+  height: 20px;
+  margin: 0 5px;
+  opacity: 0.7;
+  filter: invert(100%);          /* íconos claros sobre negro */
+  transition: opacity 0.2s;
+}
+
+.social-links a img:hover {
+  opacity: 1;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.delivery-time-picker {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.delivery-time-picker input {
+  flex: 1 1 12rem;
+}
+
+.delivery-time-picker select {
+  flex: 0 0 6rem;
+}
+
+@media (max-width: 420px) {
+  .delivery-time-picker {
+    align-items: stretch;
+  }
+}
+
+.sms-hint {
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+}
+input[disabled] + label {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
