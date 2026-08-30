@@ -1,3 +1,40 @@
+function showNotice(message, type, options) {
+    type = (type === 'success' || type === 'error') ? type : 'info';
+    options = options || {};
+
+    var container = document.getElementById('app-notice-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'app-notice-container';
+        container.className = 'app-notice-container';
+        container.setAttribute('aria-live', 'polite');
+        document.body.appendChild(container);
+    }
+
+    var notice = document.createElement('div');
+    notice.className = 'app-notice app-notice--' + type;
+    notice.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    notice.innerHTML =
+        '<span class="app-notice__icon" aria-hidden="true"></span>' +
+        '<span class="app-notice__message"></span>' +
+        '<button type="button" class="app-notice__close" aria-label="Cerrar">&times;</button>';
+    notice.querySelector('.app-notice__message').textContent = message;
+
+    function remove() {
+        notice.classList.add('app-notice--hide');
+        setTimeout(function () { notice.remove(); }, 200);
+    }
+
+    notice.querySelector('.app-notice__close').addEventListener('click', remove);
+    container.appendChild(notice);
+
+    if (!options.sticky) {
+        setTimeout(remove, options.duration || 5500);
+    }
+
+    return notice;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     window.__USE_PREVIEW_FLOW__ = true;
 
@@ -105,12 +142,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (customImageInput) {
         const previewBox = document.createElement('div');
         previewBox.id = 'cc-image-preview-box';
-        previewBox.style.marginTop = '8px';
+        previewBox.className = 'image-preview-box';
         previewBox.style.display = 'none';
         previewBox.innerHTML = `
-            <div style="font-weight:600; margin-bottom:6px;">Vista previa:</div>
-            <img id="cc-image-preview" alt="Vista previa" style="max-width:100%; height:auto; border:1px solid #ddd; border-radius:8px; padding:4px;">
-            <div id="cc-image-name" style="font-size:12px; color:#555; margin-top:4px;"></div>
+            <div class="image-preview-label">Vista previa:</div>
+            <img id="cc-image-preview" alt="Vista previa" class="image-preview-img">
+            <div id="cc-image-name" class="image-preview-name"></div>
         `;
         customImageInput.insertAdjacentElement('afterend', previewBox);
 
@@ -915,7 +952,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const requiredInputs = orderForm.querySelectorAll('[required]');
         for (let input of requiredInputs) {
             if (!input.value || !String(input.value).trim()) {
-                alert(translations[currentLang].fillRequiredFieldsError + ` (${(input.labels && input.labels[0] ? input.labels[0].textContent.replace(':','') : input.name)} )`);
+                showNotice(translations[currentLang].fillRequiredFieldsError + ` (${(input.labels && input.labels[0] ? input.labels[0].textContent.replace(':','') : input.name)} )`, 'error');
                 input.focus();
                 return false;
             }
@@ -932,7 +969,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 today.setHours(0,0,0,0);
 
                 if (deliveryDate < today) {
-                    alert(translations[currentLang].deliveryDateError);
+                    showNotice(translations[currentLang].deliveryDateError, 'error');
                     deliveryDateInput.focus();
                     return false;
                 }
@@ -943,13 +980,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const deliveryDateTime = new Date(deliveryDateParts[2], deliveryDateParts[0] - 1, deliveryDateParts[1], selectedTime.hour, selectedTime.minute, 0);
                     const diffHours = (deliveryDateTime - orderDateTime) / (1000 * 60 * 60);
                     if (diffHours < 12) {
-                        alert(translations[currentLang].customCakeAdvanceNoticeError);
+                        showNotice(translations[currentLang].customCakeAdvanceNoticeError, 'error');
                         deliveryDateInput.focus();
                         return false;
                     }
                 }
             } else {
-                alert(translations[currentLang].deliveryDateLabel.split('(')[0].trim() + ' format is invalid.');
+                showNotice(translations[currentLang].deliveryDateLabel.split('(')[0].trim() + ' format is invalid.', 'error');
                 deliveryDateInput.focus();
                 return false;
             }
@@ -959,35 +996,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedDeliveryTime = getDeliveryHour24_();
         if (!selectedDeliveryTime || selectedDeliveryTime.hour < 9 || selectedDeliveryTime.hour > 21 ||
             (selectedDeliveryTime.hour === 21 && selectedDeliveryTime.minute > 0)) {
-            alert(translations[currentLang].deliveryTimeError);
+            showNotice(translations[currentLang].deliveryTimeError, 'error');
             if (deliveryTimeInput) deliveryTimeInput.focus();
             return false;
         }
 
         if (cakeTypeHiddenInput.value === 'showcase') {
             if (!showcaseCakeSelect.value) {
-                alert(translations[currentLang].selectShowcaseCakeError);
+                showNotice(translations[currentLang].selectShowcaseCakeError, 'error');
                 showcaseCakeSelect.focus();
                 return false;
             }
             if (showcaseCakeSizeSelect && !showcaseCakeSizeSelect.disabled && showcaseCakeSizeSelect.required && !showcaseCakeSizeSelect.value) {
-                alert(translations[currentLang].cakeSizeLabel.replace(':','') + " " + translations[currentLang].fillRequiredFieldsError.toLowerCase().split(" ")[3] + ".");
+                showNotice(translations[currentLang].cakeSizeLabel.replace(':','') + " " + translations[currentLang].fillRequiredFieldsError.toLowerCase().split(" ")[3] + ".", 'error');
                 showcaseCakeSizeSelect.focus();
                 return false;
             }
         } else if (cakeTypeHiddenInput.value === 'custom') {
             if (customCakeSizeSelect && !customCakeSizeSelect.value) {
-                alert(translations[currentLang].customCakeDetailsError);
+                showNotice(translations[currentLang].customCakeDetailsError, 'error');
                 customCakeSizeSelect.focus();
                 return false;
             }
             if (customCakeTypeSelect && !customCakeTypeSelect.value) {
-                alert(translations[currentLang].fillRequiredFieldsError + ` (${customCakeTypeSelect.labels[0].textContent.replace(':','')} )`);
+                showNotice(translations[currentLang].fillRequiredFieldsError + ` (${customCakeTypeSelect.labels[0].textContent.replace(':','')} )`, 'error');
                 customCakeTypeSelect.focus();
                 return false;
             }
             if (customCakeTypeSelect && customCakeTypeSelect.value === 'otro' && otherCakeTypeInput && !otherCakeTypeInput.value.trim()) {
-                alert(translations[currentLang].customOtherCakeTypeRequiredError);
+                showNotice(translations[currentLang].customOtherCakeTypeRequiredError, 'error');
                 otherCakeTypeInput.focus();
                 return false;
             }
@@ -998,14 +1035,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (selectedFillingsCount === 2) {
                     const arrangementSelected = Array.from(fillingArrangementRadios).some(radio => radio.checked);
                     if (!arrangementSelected) {
-                        alert(translations[currentLang].fillingArrangementRequiredError);
+                        showNotice(translations[currentLang].fillingArrangementRequiredError, 'error');
                         if(fillingArrangementRadios.length > 0) fillingArrangementRadios[0].focus();
                         return false;
                     }
                     const halfHalfRadio = document.getElementById('filling-mitad-mitad');
                     if (halfHalfRadio && halfHalfRadio.checked) {
                         if (!half1FillingsInput.value.trim() || !half2FillingsInput.value.trim()) {
-                            alert(translations[currentLang].halfSpecificationRequiredError);
+                            showNotice(translations[currentLang].halfSpecificationRequiredError, 'error');
                             if (!half1FillingsInput.value.trim()) half1FillingsInput.focus();
                             else half2FillingsInput.focus();
                             return false;
@@ -1397,7 +1434,7 @@ function buildTempOrderDataFromForm() {
             })
             .then(result => {
                 if (result.status === "success") {
-                    alert("¡Pedido enviado con éxito! Tu número de orden es: " + result.orderNumber);
+                    showNotice("¡Pedido enviado con éxito! Tu número de orden es: " + result.orderNumber, 'success', { sticky: true });
 
                     // === NUEVO: accionar según preferencia de contacto (directo) ===
                     const chosenMethod = getContactMethodValue(data.contactMethod);
@@ -1428,12 +1465,12 @@ function buildTempOrderDataFromForm() {
                         if (half2FillingsInput) half2FillingsInput.value = '';
                     }
                 } else {
-                    alert("Error al enviar el pedido: " + (result.message || "Error desconocido."));
+                    showNotice("Error al enviar el pedido: " + (result.message || "Error desconocido."), 'error');
                 }
             })
             .catch(error => {
                 console.error("Error en fetch:", error);
-                alert("Hubo un problema de conexión al enviar tu pedido. Por favor, intenta de nuevo.");
+                showNotice("Hubo un problema de conexión al enviar tu pedido. Por favor, intenta de nuevo.", 'error');
             })
             .finally(() => {
                 if (btn) {
@@ -1549,7 +1586,7 @@ function buildTempOrderDataFromForm() {
             .then(result => {
                 closeOrderPreview();
                 if (result.status === "success") {
-                    alert("¡Pedido enviado con éxito! Tu número de orden es: " + result.orderNumber);
+                    showNotice("¡Pedido enviado con éxito! Tu número de orden es: " + result.orderNumber, 'success', { sticky: true });
 
                     // === NUEVO: accionar según preferencia de contacto (preview) ===
                     const chosenMethod = getContactMethodValue(dataToSend.contactMethod);
@@ -1605,13 +1642,13 @@ function buildTempOrderDataFromForm() {
                         if (pb) pb.style.display = 'none';
                     }
                 } else {
-                    alert("Error al enviar el pedido: " + (result.message || "Error desconocido."));
+                    showNotice("Error al enviar el pedido: " + (result.message || "Error desconocido."), 'error');
                 }
             })
             .catch(error => {
                 closeOrderPreview();
                 console.error("Error en fetch:", error);
-                alert("Hubo un problema de conexión al enviar tu pedido. Por favor, intenta de nuevo.");
+                showNotice("Hubo un problema de conexión al enviar tu pedido. Por favor, intenta de nuevo.", 'error');
             })
             .finally(() => {
                 previewConfirmOrderBtn.disabled = false;
@@ -1683,43 +1720,31 @@ function buildTempOrderDataFromForm() {
     document.body.appendChild(overlay);
   }
 
-  // Estilo base del overlay (oscuro translúcido)
+  // Estilo base del overlay (translúcido, coherente con los demás modales del sitio)
   overlay.style.cssText =
     "position:fixed;inset:0;display:none;align-items:center;justify-content:center;" +
-    "background:rgba(0,0,0,.55);z-index:9999;";
+    "background:rgba(34,34,34,.6);z-index:9999;padding:1.25rem;";
 
   function renderModal() {
     const copy = t(getLang());
     overlay.innerHTML = `
-      <div role="dialog" aria-modal="true"
-           style="max-width:560px;width:92%;background:#101010;border:1px solid #222;
-                  border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.6);color:#eee;">
-        <div style="display:flex;align-items:center;justify-content:space-between;
-                    padding:14px 18px;border-bottom:1px solid #1e1e1e;">
-          <div style="display:flex;gap:10px;align-items:center;">
-            <h3 style="margin:0;font-size:18px;">${copy.title}</h3>
-          </div>
-          <button id="csClose" aria-label="Cerrar"
-                  style="background:transparent;border:0;color:#bbb;font-size:20px;cursor:pointer;">×</button>
+      <div role="dialog" aria-modal="true" class="order-status-coming-soon">
+        <div class="order-status-coming-soon__header">
+          <h3>${copy.title}</h3>
+          <button id="csClose" aria-label="Cerrar" class="order-status-coming-soon__close">×</button>
         </div>
 
-        <div style="padding:18px 20px;">
-          <p style="margin:0 0 12px;line-height:1.55;">${copy.lead}</p>
+        <div class="order-status-coming-soon__body">
+          <p>${copy.lead}</p>
 
-          <div style="display:flex;gap:10px;align-items:flex-start;background:#161616;
-                      border:1px solid #252525;border-radius:10px;padding:12px 14px;">
-            <div style="width:10px;height:10px;background:#f4c542;border-radius:50%;
-                        margin-top:6px;"></div>
-            <p style="margin:0;color:#d6d6d6;">${copy.note}</p>
+          <div class="order-status-coming-soon__note">
+            <span class="order-status-coming-soon__dot"></span>
+            <p>${copy.note}</p>
           </div>
         </div>
 
-        <div style="padding:14px 18px;border-top:1px solid #1e1e1e;display:flex;justify-content:flex-end;">
-          <button id="csOk"
-                  style="background:#f4c542;border:0;color:#111;font-weight:700;
-                         padding:10px 14px;border-radius:10px;cursor:pointer;">
-            ${copy.ok}
-          </button>
+        <div class="order-status-coming-soon__footer">
+          <button id="csOk" class="order-status-coming-soon__ok">${copy.ok}</button>
         </div>
       </div>
     `;
@@ -1794,7 +1819,7 @@ if (statusConfirmBtnScoped) {
     })
     .then(res => res.json())
     .then(data => {
-      alert("✅ Pedido confirmado correctamente.");
+      showNotice("Pedido confirmado correctamente.", 'success');
       document.getElementById("confirmationActions").style.display = "none";
     });
   });
@@ -1806,7 +1831,7 @@ document.getElementById("cancelOrderBtn").addEventListener("click", () => {
 
 document.getElementById("submitCancelBtn").addEventListener("click", () => {
   const motivo = document.getElementById("cancelReason").value.trim();
-  if (!motivo) return alert("Debes escribir el motivo de cancelación");
+  if (!motivo) { showNotice("Debes escribir el motivo de cancelación", 'error'); return; }
 
   fetch("https://script.google.com/macros/s/AKfycbyfsCSsdKiX8rLAwoNllk-J3lFQbh3Tujb9cEr1dV9aJ3vqtkSsYXeqoioXyWXzP34E/exec", {
     method: "POST",
@@ -1821,7 +1846,7 @@ document.getElementById("submitCancelBtn").addEventListener("click", () => {
   })
   .then(res => res.json())
   .then(data => {
-    alert("❌ Pedido cancelado correctamente.");
+    showNotice("Pedido cancelado correctamente.", 'success');
     document.getElementById("confirmationActions").style.display = "none";
     document.getElementById("cancelReasonContainer").style.display = "none";
   });
@@ -1843,11 +1868,11 @@ function enviarFormulario(referenceImageBase64) {
   .then(res => res.json())
   .then(data => {
     console.log("Respuesta del servidor:", data);
-    alert("✅ Pedido enviado con éxito");
+    showNotice("Pedido enviado con éxito", 'success', { sticky: true });
   })
   .catch(err => {
     console.error("Error al enviar pedido:", err);
-    alert("❌ Error al enviar el pedido");
+    showNotice("Error al enviar el pedido", 'error');
   });
 }
 
@@ -1879,7 +1904,7 @@ document.getElementById('sc-message-color').addEventListener('change', function 
   phoneInput.addEventListener('input', () => {
     // Si hay caracteres que no sean dígitos
     if (/[^0-9]/.test(phoneInput.value)) {
-      alert('Solo se permiten números en el teléfono');
+      showNotice('Solo se permiten números en el teléfono', 'error', { duration: 3000 });
       phoneInput.value = phoneInput.value.replace(/[^0-9]/g, '');
     }
   });
