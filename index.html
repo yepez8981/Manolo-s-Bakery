@@ -35,13 +35,13 @@
            <div id="statusResult" class="notice" style="display:none;"></div>
            </div>
            </div>
-           <div id="confirmationActions" style="display:none; margin-top: 1.5rem;">
-           <button id="confirmOrderBtn" style="background-color: #4CAF50; color: white; border: none; padding: 10px 16px; border-radius: 6px; margin-right: 8px; cursor: pointer;">✅ Confirmar pedido</button>
-           <button id="cancelOrderBtn" style="background-color: #e53935; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer;">❌ Cancelar pedido</button>
-           <div id="cancelReasonContainer" style="margin-top: 1rem; display: none;">
-           <label for="cancelReason" style="font-weight: bold;">Motivo de cancelación:</label>
-           <input type="text" id="cancelReason" placeholder="Ej. Ya no lo necesito" style="width:100%; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px;">
-           <button id="submitCancelBtn" style="margin-top: 10px; background-color: #d32f2f; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer;">Enviar cancelación</button>
+           <div id="confirmationActions" class="confirmation-actions" style="display:none;">
+           <button id="confirmOrderBtn" class="button-confirm-order">✅ Confirmar pedido</button>
+           <button id="cancelOrderBtn" class="button-cancel-order">❌ Cancelar pedido</button>
+           <div id="cancelReasonContainer" class="cancel-reason-container" style="display:none;">
+           <label for="cancelReason" class="cancel-reason-label">Motivo de cancelación:</label>
+           <input type="text" id="cancelReason" placeholder="Ej. Ya no lo necesito" class="cancel-reason-input">
+           <button id="submitCancelBtn" class="button-submit-cancel">Enviar cancelación</button>
            </div>  
            </div>
 
