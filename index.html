@@ -78,13 +78,8 @@
                     <label for="deliveryTimeInput" data-translate="deliveryTimeLabel">Hora de Entrega/Recogida:</label>
                     <div class="delivery-time-picker">
                         <input type="time" id="deliveryTimeInput" step="60" aria-label="Hora exacta" required>
-                        <select id="deliveryMeridiem" aria-label="AM o PM" required>
-                            <option value="">AM/PM</option>
-                            <option value="AM">AM</option>
-                            <option value="PM">PM</option>
-                        </select>
                     </div>
-                    <small class="field-hint">Selecciona la hora exacta y si corresponde a AM o PM.</small>
+                    <small class="field-hint">Selecciona la hora exacta de entrega o recogida.</small>
                     <!-- Valor normalizado que se envía al servidor, por ejemplo: 03:30 PM -->
                     <input type="hidden" id="deliveryTime" name="deliveryTime" required>
 
