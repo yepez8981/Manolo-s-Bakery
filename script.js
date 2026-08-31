@@ -915,28 +915,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Form Validation ---
     // La API recibe una hora inequívoca de 12 horas (ej.: "03:30 PM").
     // El campo oculto conserva el nombre deliveryTime usado por el resto del flujo.
+    // El input type="time" siempre guarda su valor en formato 24h (HH:mm), sin importar
+    // cómo lo muestre el navegador, así que el AM/PM se calcula solo, sin pedirlo aparte.
     const deliveryTimeInput = document.getElementById('deliveryTimeInput');
-    const deliveryMeridiem = document.getElementById('deliveryMeridiem');
     const deliveryTimeHidden = document.getElementById('deliveryTime');
 
     function syncDeliveryTime() {
-        if (!deliveryTimeInput || !deliveryMeridiem || !deliveryTimeHidden) return '';
-        if (!deliveryTimeInput.value || !deliveryMeridiem.value) {
+        if (!deliveryTimeInput || !deliveryTimeHidden) return '';
+        if (!deliveryTimeInput.value) {
             deliveryTimeHidden.value = '';
             return '';
         }
         const parts = deliveryTimeInput.value.split(':');
         let hour = Number(parts[0]);
         const minute = parts[1];
+        const meridiem = hour >= 12 ? 'PM' : 'AM';
         // El input de tipo time entrega 00-23. Convertimos a 12 horas sin ambigüedad.
         hour = hour % 12;
         if (hour === 0) hour = 12;
-        deliveryTimeHidden.value = String(hour).padStart(2, '0') + ':' + minute + ' ' + deliveryMeridiem.value;
+        deliveryTimeHidden.value = String(hour).padStart(2, '0') + ':' + minute + ' ' + meridiem;
         return deliveryTimeHidden.value;
     }
 
     if (deliveryTimeInput) deliveryTimeInput.addEventListener('input', syncDeliveryTime);
-    if (deliveryMeridiem) deliveryMeridiem.addEventListener('change', syncDeliveryTime);
 
     function getDeliveryHour24_() {
         const value = syncDeliveryTime();
