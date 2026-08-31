@@ -410,6 +410,150 @@ input[disabled] + label {
 }
 
 /* =========================================================
+   RELLENOS — cada opción "pintada" con el tono de su sabor
+   ========================================================= */
+#cc-fillings-group > div:has(#filling-peach)              { --flavor: #e8823f; --flavor-bg: #fdecdd; }
+#cc-fillings-group > div:has(#filling-walnut)              { --flavor: #9c7245; --flavor-bg: #ece2d4; }
+#cc-fillings-group > div:has(#filling-chocolate-chips)     { --flavor: #6b4226; --flavor-bg: #e8dcd2; }
+#cc-fillings-group > div:has(#filling-mocha)                { --flavor: #8c5a3a; --flavor-bg: #ecdfd2; }
+#cc-fillings-group > div:has(#filling-cherry)                { --flavor: #d9434f; --flavor-bg: #fbdde0; }
+#cc-fillings-group > div:has(#filling-strawberry-natural)   { --flavor: #f0658c; --flavor-bg: #fde3ec; }
+#cc-fillings-group > div:has(#filling-strawberry-jam)        { --flavor: #e0517d; --flavor-bg: #fbd7e3; }
+#cc-fillings-group > div:has(#filling-chocolate-dry)         { --flavor: #5b3a29; --flavor-bg: #e6dad2; }
+#cc-fillings-group > div:has(#filling-pineapple-jam)          { --flavor: #d1a900; --flavor-bg: #fdf3cf; }
+#cc-fillings-group > div:has(#filling-caramel)                { --flavor: #c9860a; --flavor-bg: #fbecd2; }
+#cc-fillings-group > div:has(#filling-nutella)                { --flavor: #6f4423; --flavor-bg: #e8d8ca; }
+#cc-fillings-group > div:has(#filling-pistachio)               { --flavor: #7cb342; --flavor-bg: #eaf3e0; }
+#cc-fillings-group > div:has(#filling-other)                  { --flavor: #8a8686; --flavor-bg: #f0eeee; }
+
+#cc-fillings-group > div:has(input[type="checkbox"]) {
+    background-color: var(--flavor-bg, var(--base-3));
+    border-color: var(--flavor, var(--global-color-13));
+}
+
+#cc-fillings-group > div:has(input[type="checkbox"]:checked) {
+    box-shadow: 0 0 0 2px var(--flavor, var(--global-color-10));
+    font-weight: 600;
+}
+
+#cc-fillings-group > div input[type="checkbox"] {
+    border-color: var(--flavor, var(--contrast-3));
+}
+
+#cc-fillings-group > div input[type="checkbox"]:checked {
+    background-color: var(--flavor, var(--global-color-10));
+    border-color: var(--flavor, var(--global-color-10));
+}
+
+/* Pequeño punto de color junto a cada nombre de relleno */
+#cc-fillings-group > div label::before {
+    content: "";
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background-color: var(--flavor, var(--contrast-3));
+    margin-right: 0.45rem;
+    vertical-align: middle;
+}
+
+/* =========================================================
+   MODAL FINAL: "Revisa Tu Pedido"
+   ========================================================= */
+#orderPreviewModal .modal-content {
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--global-color-13);
+}
+
+#orderPreviewModal .modal-content::before {
+    content: "";
+    display: block;
+    height: 6px;
+    background: linear-gradient(90deg, var(--global-color-9), var(--global-color-10));
+}
+
+#orderPreviewModal h3 {
+    margin: 0;
+    padding: var(--space-3) clamp(1.25rem, 4vw, 2rem) var(--space-2);
+    border-bottom: 1px solid var(--global-color-13);
+    color: var(--contrast-2);
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+#orderPreviewModal h3::before {
+    content: "🎂";
+    margin-right: 0.5rem;
+}
+
+#orderPreviewModal .order-details-preview {
+    padding: var(--space-3) clamp(1.25rem, 4vw, 2rem);
+    max-height: min(55dvh, 55vh);
+    overflow-y: auto;
+    margin-bottom: 0;
+}
+
+#orderPreviewModal .order-details-preview table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#orderPreviewModal .order-details-preview tr {
+    border-bottom: 1px solid var(--base);
+    transition: background-color var(--transition);
+}
+
+#orderPreviewModal .order-details-preview tr:hover {
+    background-color: var(--base);
+}
+
+#orderPreviewModal .order-details-preview td {
+    padding: 0.55rem 0.4rem !important;
+    font-size: 0.95rem;
+    color: var(--contrast-2);
+}
+
+#orderPreviewModal .order-details-preview strong {
+    color: var(--global-color-10);
+    font-weight: 700;
+}
+
+#orderPreviewModal .order-details-preview hr {
+    border-top: 1px dashed var(--global-color-13);
+    margin: var(--space-2) 0;
+}
+
+#orderPreviewModal .order-details-preview h4 {
+    color: var(--contrast-2) !important;
+    font-size: 1.05rem;
+    border-left: 4px solid var(--global-color-9);
+    padding-left: 0.6rem;
+}
+
+#orderPreviewModal .modal-actions {
+    padding: var(--space-2) clamp(1.25rem, 4vw, 2rem) var(--space-3);
+    margin-top: 0;
+    background-color: var(--base);
+    border-top: 1px solid var(--global-color-13);
+}
+
+#orderPreviewModal .button-primary::before { content: "✅ "; }
+#orderPreviewModal .button-secondary::before { content: "✏️ "; }
+
+#orderPreviewModal .button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(24, 181, 172, 0.35);
+}
+
+/* Scrollbar discreto para el listado de detalles (navegadores WebKit) */
+#orderPreviewModal .order-details-preview::-webkit-scrollbar { width: 8px; }
+#orderPreviewModal .order-details-preview::-webkit-scrollbar-thumb {
+    background-color: var(--global-color-13);
+    border-radius: 999px;
+}
+
+/* =========================================================
    NOTIFICACIONES (reemplazan a alert() nativo)
    ========================================================= */
 .app-notice-container {
@@ -738,10 +882,21 @@ input[disabled] + label {
 }
 
 .contact-options div:has(input:checked),
-.checkbox-group > div:has(input:checked),
 .decoration-option:has(input:checked) {
     border-color: var(--global-color-10);
     background-color: rgba(24, 181, 172, 0.08);
+}
+
+/* Los rellenos usan --chip-accent / --chip-tint (definidos más abajo por sabor);
+   el resto de grupos (contacto, decoración) no los tiene y cae en el teal de marca. */
+.checkbox-group > div:has(input:checked) {
+    border-color: var(--chip-accent, var(--global-color-10));
+    background-color: var(--chip-tint, rgba(24, 181, 172, 0.08));
+}
+
+.checkbox-group > div input[type="checkbox"]:checked {
+    background-color: var(--chip-accent, var(--global-color-10));
+    border-color: var(--chip-accent, var(--global-color-10));
 }
 
 .contact-options div:has(input:disabled),
@@ -757,6 +912,26 @@ input[disabled] + label {
     color: var(--contrast-2);
     cursor: pointer;
 }
+
+/* --- Colores de relleno: cada sabor tiene su propio acento y fondo suave --- */
+#cc-fillings-group > div {
+    border-left-width: 5px;
+    border-left-color: var(--chip-accent, var(--global-color-13));
+}
+
+#cc-fillings-group > div:has(#filling-peach)              { --chip-accent: #f2994a; --chip-tint: #fdecd9; }
+#cc-fillings-group > div:has(#filling-walnut)              { --chip-accent: #8a5a35; --chip-tint: #efe4d8; }
+#cc-fillings-group > div:has(#filling-chocolate-chips)     { --chip-accent: #4b2e2e; --chip-tint: #e9dedb; }
+#cc-fillings-group > div:has(#filling-mocha)                { --chip-accent: #6f4e37; --chip-tint: #efe2d6; }
+#cc-fillings-group > div:has(#filling-cherry)                { --chip-accent: #c8102e; --chip-tint: #fbe2e4; }
+#cc-fillings-group > div:has(#filling-strawberry-natural)   { --chip-accent: #ef4f6b; --chip-tint: #fde3e8; }
+#cc-fillings-group > div:has(#filling-strawberry-jam)        { --chip-accent: #d81159; --chip-tint: #fbdfea; }
+#cc-fillings-group > div:has(#filling-chocolate-dry)         { --chip-accent: #3b2620; --chip-tint: #e7dedb; }
+#cc-fillings-group > div:has(#filling-pineapple-jam)         { --chip-accent: #f0c419; --chip-tint: #fdf6d8; }
+#cc-fillings-group > div:has(#filling-caramel)               { --chip-accent: #b5651d; --chip-tint: #f6e5d0; }
+#cc-fillings-group > div:has(#filling-nutella)               { --chip-accent: #5a3825; --chip-tint: #e9ddd3; }
+#cc-fillings-group > div:has(#filling-pistachio)             { --chip-accent: #8bab5c; --chip-tint: #ecf3e3; }
+#cc-fillings-group > div:has(#filling-other)                 { --chip-accent: var(--contrast-3); --chip-tint: var(--base); }
 
 .selected-fillings-info {
     display: inline-block;
@@ -780,17 +955,10 @@ input[disabled] + label {
    ========================================================= */
 .delivery-time-picker {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    align-items: stretch;
 }
 
 .delivery-time-picker input {
-    flex: 1 1 12rem;
-}
-
-.delivery-time-picker select {
-    flex: 1 1 7rem;
+    width: 100%;
 }
 
 /* =========================================================
@@ -963,13 +1131,25 @@ button[type="submit"]:active { transform: translateY(0); }
     background-color: var(--base-2);
     padding: clamp(1.25rem, 4vw, 2rem);
     border-radius: var(--radius-md);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.28);
     width: min(600px, 100%);
     max-height: min(85dvh, 85vh);
     overflow-y: auto;
+    overflow-x: hidden;
     transform: scale(0.96);
     transition: transform 0.3s ease;
     position: relative;
+}
+
+/* Franja superior con los colores de la marca (dorado -> teal) */
+.modal-content::before {
+    content: "";
+    position: sticky;
+    top: 0;
+    display: block;
+    margin: calc(-1 * clamp(1.25rem, 4vw, 2rem)) calc(-1 * clamp(1.25rem, 4vw, 2rem)) 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--global-color-9), var(--global-color-10));
 }
 
 .modal-overlay.active .modal-content {
@@ -988,20 +1168,93 @@ button[type="submit"]:active { transform: translateY(0); }
 
 .modal-content h3,
 .order-status-modal h2 {
-    margin-top: 0;
+    margin-top: 1rem;
     color: var(--contrast);
-    border-bottom: 1px solid var(--global-color-13);
-    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--global-color-9);
+    padding-bottom: 0.6rem;
+    font-size: 1.3rem;
 }
 
+.modal-content h3::before {
+    content: "🎂 ";
+}
+
+/* =========================================================
+   TABLA DE DETALLES DEL PEDIDO (generada por JS)
+   La estructura HTML se arma dinámicamente con estilos en
+   línea; aquí se sobreescriben con !important para que se
+   vea igual de cuidada que el resto del formulario, sin
+   tocar la lógica que arma cada fila.
+   ========================================================= */
 .order-details-preview {
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
     font-size: 0.95rem;
-    line-height: 1.7;
 }
 
-.order-details-preview p { margin: 0.5rem 0; }
-.order-details-preview strong { color: var(--contrast-2); }
+.order-details-preview table {
+    width: 100% !important;
+    border-collapse: collapse;
+    background-color: var(--base-3);
+    border: 1px solid var(--global-color-13);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.order-details-preview tr {
+    border-bottom: 1px solid var(--global-color-13);
+}
+
+.order-details-preview tr:last-child { border-bottom: none; }
+
+.order-details-preview tr:nth-child(even) { background-color: var(--base); }
+
+.order-details-preview td {
+    padding: 0.6rem 0.85rem !important;
+    line-height: 1.5 !important;
+    color: var(--contrast-2) !important;
+    vertical-align: top !important;
+}
+
+.order-details-preview td:first-child {
+    width: 42% !important;
+    color: var(--contrast-3) !important;
+    font-weight: 600;
+}
+
+.order-details-preview strong {
+    color: var(--contrast-3) !important;
+    font-weight: 600 !important;
+}
+
+.order-details-preview img {
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--global-color-13) !important;
+    box-shadow: var(--box-shadow);
+}
+
+.order-details-preview hr {
+    border-top: 1px dashed var(--global-color-13);
+    margin: var(--space-3) 0 var(--space-2);
+}
+
+.order-details-preview h4 {
+    margin: 0 0 var(--space-2) !important;
+    padding-bottom: 0.4rem;
+    color: var(--contrast-2) !important;
+    border-bottom: 2px solid var(--global-color-10);
+    font-size: 1.05rem;
+}
+
+.order-details-preview > p:last-child {
+    margin-top: var(--space-2) !important;
+    padding: 0.6rem 0.85rem;
+    background-color: var(--base);
+    border-left: 4px solid var(--global-color-9);
+    border-radius: var(--radius-sm);
+    font-style: italic !important;
+    color: var(--contrast-3) !important;
+    font-size: 0.85rem;
+}
 
 .modal-actions {
     display: flex;
@@ -1009,6 +1262,8 @@ button[type="submit"]:active { transform: translateY(0); }
     justify-content: flex-end;
     gap: 0.75rem;
     margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--global-color-13);
 }
 
 .modal-actions button {
@@ -1019,19 +1274,23 @@ button[type="submit"]:active { transform: translateY(0); }
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-weight: bold;
-    transition: background-color var(--transition);
+    transition: background-color var(--transition), transform var(--transition);
 }
+
+.modal-actions button:active { transform: translateY(1px); }
 
 .modal-actions .button-primary {
     background-color: var(--global-color-10);
     color: var(--base-2);
 }
+.modal-actions .button-primary::before { content: "✅ "; }
 .modal-actions .button-primary:hover { background-color: #15a097; }
 
 .modal-actions .button-secondary {
     background-color: var(--accent);
     color: var(--base-2);
 }
+.modal-actions .button-secondary::before { content: "✖ "; }
 .modal-actions .button-secondary:hover { background-color: var(--accent-hover); }
 
 .close-modal {
