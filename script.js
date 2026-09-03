@@ -852,6 +852,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (showcaseCakeSelect) showcaseCakeSelect.required = false;
             if (showcaseCakeSizeSelect) showcaseCakeSizeSelect.required = false;
+            if (document.getElementById('cc-flavor')) document.getElementById('cc-flavor').required = true;
+            if (document.getElementById('heart-shape')) document.getElementById('heart-shape').required = true;
+            if (document.getElementById('with-photo')) document.getElementById('with-photo').required = true;
+            if (document.getElementById('design-image')) document.getElementById('design-image').required = true;
         } else { // showcase
             if (customCakeSizeSelect) customCakeSizeSelect.required = false;
             if (customCakeTypeSelect) customCakeTypeSelect.required = false;
@@ -878,6 +882,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     half2FillingsInput.required = false;
                 }
             }
+
+            if (document.getElementById('cc-flavor')) document.getElementById('cc-flavor').required = false;
+            if (document.getElementById('heart-shape')) document.getElementById('heart-shape').required = false;
+            if (document.getElementById('with-photo')) document.getElementById('with-photo').required = false;
+            if (document.getElementById('design-image')) document.getElementById('design-image').required = false;
 
             if (showcaseCakeSelect) showcaseCakeSelect.required = true;
             if (showcaseCakeSizeSelect) {
@@ -1013,6 +1022,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 showcaseCakeSizeSelect.focus();
                 return false;
             }
+
+            var scCakeMsg = document.getElementById('sc-cakeMessage');
+            if (scCakeMsg && scCakeMsg.value.trim()) {
+                var scLocChecked = document.querySelector('input[name="sc-messageLocation"]:checked');
+                if (!scLocChecked) {
+                    showNotice(translations[currentLang].fillRequiredFieldsError + ' (' + translations[currentLang].messageLocationLabel.replace(':','') + ')', 'error');
+                    return false;
+                }
+                var scMsgColor = document.getElementById('sc-message-color');
+                if (scMsgColor && !scMsgColor.value) {
+                    showNotice(translations[currentLang].fillRequiredFieldsError + ' (' + translations[currentLang].messageColorLabel.replace(':','') + ')', 'error');
+                    scMsgColor.focus();
+                    return false;
+                }
+                var scMsgFont = document.getElementById('sc-message-font');
+                if (scMsgFont && !scMsgFont.value) {
+                    showNotice(translations[currentLang].fillRequiredFieldsError + ' (' + translations[currentLang].messageFontLabel.replace(':','') + ')', 'error');
+                    scMsgFont.focus();
+                    return false;
+                }
+            }
         } else if (cakeTypeHiddenInput.value === 'custom') {
             if (customCakeSizeSelect && !customCakeSizeSelect.value) {
                 showNotice(translations[currentLang].customCakeDetailsError, 'error');
@@ -1027,6 +1057,34 @@ document.addEventListener('DOMContentLoaded', function() {
             if (customCakeTypeSelect && customCakeTypeSelect.value === 'otro' && otherCakeTypeInput && !otherCakeTypeInput.value.trim()) {
                 showNotice(translations[currentLang].customOtherCakeTypeRequiredError, 'error');
                 otherCakeTypeInput.focus();
+                return false;
+            }
+
+            var layersEl = document.getElementById('cc-flavor');
+            if (layersEl && !layersEl.value) {
+                showNotice(translations[currentLang].fillRequiredFieldsError + ' (' + (layersEl.labels && layersEl.labels[0] ? layersEl.labels[0].textContent.replace(':','') : 'Capas') + ')', 'error');
+                layersEl.focus();
+                return false;
+            }
+
+            var heartEl = document.getElementById('heart-shape');
+            if (heartEl && !heartEl.value) {
+                showNotice(translations[currentLang].fillRequiredFieldsError + ' (' + (heartEl.labels && heartEl.labels[0] ? heartEl.labels[0].textContent.replace(':','') : 'Forma de corazón') + ')', 'error');
+                heartEl.focus();
+                return false;
+            }
+
+            var photoEl = document.getElementById('with-photo');
+            if (photoEl && !photoEl.value) {
+                showNotice(translations[currentLang].fillRequiredFieldsError + ' (' + (photoEl.labels && photoEl.labels[0] ? photoEl.labels[0].textContent.replace(':','') : 'Con foto') + ')', 'error');
+                photoEl.focus();
+                return false;
+            }
+
+            var designEl = document.getElementById('design-image');
+            if (designEl && !designEl.value) {
+                showNotice(translations[currentLang].fillRequiredFieldsError + ' (' + (designEl.labels && designEl.labels[0] ? designEl.labels[0].textContent.replace(':','') : 'Imagen de diseño') + ')', 'error');
+                designEl.focus();
                 return false;
             }
 
@@ -1884,8 +1942,18 @@ document.getElementById('sc-cakeMessage').addEventListener('input', function () 
     if (!optionsGroup) return;
     if (message.length > 0) {
         optionsGroup.style.display = 'block';
+        document.querySelectorAll('input[name="sc-messageLocation"]').forEach(r => r.required = true);
+        var scMsgColor = document.getElementById('sc-message-color');
+        var scMsgFont = document.getElementById('sc-message-font');
+        if (scMsgColor) scMsgColor.required = true;
+        if (scMsgFont) scMsgFont.required = true;
     } else {
         optionsGroup.style.display = 'none';
+        document.querySelectorAll('input[name="sc-messageLocation"]').forEach(r => { r.required = false; r.checked = false; });
+        var scMsgColor = document.getElementById('sc-message-color');
+        var scMsgFont = document.getElementById('sc-message-font');
+        if (scMsgColor) { scMsgColor.required = false; scMsgColor.value = ''; }
+        if (scMsgFont) { scMsgFont.required = false; scMsgFont.value = ''; }
     }
 });
 
