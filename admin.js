@@ -105,12 +105,14 @@
     }
 
     function save(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
+        try { localStorage.setItem(key, JSON.stringify(data)); }
+        catch (e) { console.warn('localStorage no disponible:', e); }
         pushAllToServer();
     }
 
     function saveToLocalOnly(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
+        try { localStorage.setItem(key, JSON.stringify(data)); }
+        catch (e) { console.warn('localStorage no disponible:', e); }
     }
 
     /* =========================================================
@@ -302,16 +304,8 @@
         var passwordInput = $('adminPassword');
         var loginError = $('loginError');
 
-        if (sessionStorage.getItem('manolos_admin_auth') === '1') {
-            showDashboard();
-            return;
-        }
-
-        loginBtn.addEventListener('click', doLogin);
-        passwordInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') doLogin();
-        });
-
+        // SIEMPRE registrar el manejador del botón (aunque ya haya sesión),
+        // para que tras cerrar sesión se pueda volver a ingresar.
         function doLogin() {
             if (passwordInput.value === ADMIN_PASSWORD) {
                 sessionStorage.setItem('manolos_admin_auth', '1');
@@ -323,6 +317,18 @@
                 passwordInput.focus();
             }
         }
+
+        if (loginBtn) loginBtn.addEventListener('click', doLogin);
+        if (passwordInput) passwordInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        // Si ya hay sesión activa, entrar directo
+        try {
+            if (sessionStorage.getItem('manolos_admin_auth') === '1') {
+                showDashboard();
+            }
+        } catch (e) { /* storage no disponible */ }
     }
 
     function showDashboard() {
@@ -383,7 +389,7 @@
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td>' + (item.fixedSize ? '<strong>' + escapeHtml(item.fixedSize) + '</strong>' : '<span style="color:var(--contrast-3)">—</span>') + '</td>' +
                 '<td class="col-actions">' +
-                    '<button class="btn-danger" data-action="delete" data-cat="showcaseCakes" data-idx="' + i + '">Eliminar</button>' +
+                    '<button type="button" class="btn-danger" onclick="deleteAdminItem(\'showcaseCakes\',' + i + ')">Eliminar</button>' +
                 '</td>' +
             '</tr>';
         }).join('');
@@ -407,7 +413,7 @@
                 '<td><strong>' + escapeHtml(item.label) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
-                    '<button class="btn-danger" data-action="delete" data-cat="showcaseSizes" data-idx="' + i + '">Eliminar</button>' +
+                    '<button type="button" class="btn-danger" onclick="deleteAdminItem(\'showcaseSizes\',' + i + ')">Eliminar</button>' +
                 '</td>' +
             '</tr>';
         }).join('');
@@ -431,7 +437,7 @@
                 '<td><strong>' + escapeHtml(item.name) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
-                    '<button class="btn-danger" data-action="delete" data-cat="customTypes" data-idx="' + i + '">Eliminar</button>' +
+                    '<button type="button" class="btn-danger" onclick="deleteAdminItem(\'customTypes\',' + i + ')">Eliminar</button>' +
                 '</td>' +
             '</tr>';
         }).join('');
@@ -455,7 +461,7 @@
                 '<td><strong>' + escapeHtml(item.label) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
-                    '<button class="btn-danger" data-action="delete" data-cat="customSizes" data-idx="' + i + '">Eliminar</button>' +
+                    '<button type="button" class="btn-danger" onclick="deleteAdminItem(\'customSizes\',' + i + ')">Eliminar</button>' +
                 '</td>' +
             '</tr>';
         }).join('');
@@ -479,7 +485,7 @@
                 '<td><strong>' + escapeHtml(item.name) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
-                    '<button class="btn-danger" data-action="delete" data-cat="fillings" data-idx="' + i + '">Eliminar</button>' +
+                    '<button type="button" class="btn-danger" onclick="deleteAdminItem(\'fillings\',' + i + ')">Eliminar</button>' +
                 '</td>' +
             '</tr>';
         }).join('');
@@ -503,7 +509,7 @@
                 '<td><strong>' + escapeHtml(item.label) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
-                    '<button class="btn-danger" data-action="delete" data-cat="layers" data-idx="' + i + '">Eliminar</button>' +
+                    '<button type="button" class="btn-danger" onclick="deleteAdminItem(\'layers\',' + i + ')">Eliminar</button>' +
                 '</td>' +
             '</tr>';
         }).join('');
@@ -631,45 +637,39 @@
     }
 
     /* =========================================================
-       DELETE ACTIONS (delegated, with confirm modal)
+       DELETE ACTIONS (global function para botones onclick)
     ========================================================= */
-    function initDeleteDelegation() {
-        document.addEventListener('click', function (e) {
-            var btn = e.target.closest('[data-action="delete"]');
-            if (!btn) return;
+    var renderMap = {
+        showcaseCakes: renderShowcaseCakes,
+        showcaseSizes: renderShowcaseSizes,
+        customTypes: renderCustomTypes,
+        customSizes: renderCustomSizes,
+        fillings: renderFillings,
+        layers: renderLayers
+    };
 
-            var cat = btn.dataset.cat;
-            var idx = parseInt(btn.dataset.idx, 10);
-            var key = KEYS[cat];
-            if (!key) return;
+    window.deleteAdminItem = function (cat, idx) {
+        var key = KEYS[cat];
+        if (!key) return;
 
-            var data = getData(key);
-            var itemName = data[idx] ? (data[idx].name || data[idx].label || data[idx].value) : '';
+        var data = getData(key);
+        var item = data[idx];
+        var itemName = item ? (item.name || item.label || item.value) : '';
 
-            confirmAction(
-                '¿Eliminar "' + itemName + '"?',
-                'Esta acción no se puede deshacer.'
-            ).then(function (confirmed) {
-                if (!confirmed) return;
+        confirmAction(
+            '¿Eliminar "' + itemName + '"?',
+            'Esta acción no se puede deshacer.'
+        ).then(function (confirmed) {
+            if (!confirmed) return;
 
-                data.splice(idx, 1);
-                save(key, data);
+            data.splice(idx, 1);
+            save(key, data);
 
-                var renderMap = {
-                    showcaseCakes: renderShowcaseCakes,
-                    showcaseSizes: renderShowcaseSizes,
-                    customTypes: renderCustomTypes,
-                    customSizes: renderCustomSizes,
-                    fillings: renderFillings,
-                    layers: renderLayers
-                };
-
-                if (renderMap[cat]) renderMap[cat]();
-                updateStats();
-                toast('Eliminado correctamente', 'success');
-            });
+            if (renderMap[cat]) renderMap[cat]();
+            updateStats();
+            toast('Eliminado correctamente', 'success');
         });
-    }
+    };
 
     /* =========================================================
        LOGOUT
@@ -685,14 +685,30 @@
     }
 
     /* =========================================================
+       GLOBAL ERROR SURFACING (para no fallar en silencio)
+    ========================================================= */
+    window.addEventListener('error', function (e) {
+        console.error('❌ Error en admin.js:', e.message, e.filename, e.lineno);
+        toast('Ocurrió un error: ' + e.message, 'error');
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+        console.error('❌ Promesa rechazada:', e.reason);
+    });
+
+    /* =========================================================
        INIT
     ========================================================= */
     document.addEventListener('DOMContentLoaded', function () {
-        initLogin();
-        initSidebar();
-        initAddButtons();
-        initDeleteDelegation();
-        initLogout();
+        try {
+            initLogin();
+            initSidebar();
+            initAddButtons();
+            initLogout();
+            console.log('✅ Manolo Admin inicializado correctamente');
+        } catch (err) {
+            console.error('❌ Falló la inicialización:', err);
+            toast('Error al iniciar el panel: ' + err.message, 'error');
+        }
     });
 
 })();
