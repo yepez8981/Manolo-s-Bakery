@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Manolo's Bakery</title>
+    <title>Manolo's Bakery — Colección Ejecutiva</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin.css">
 </head>
@@ -12,47 +12,65 @@
     <!-- ========== LOGIN SCREEN ========== -->
     <div id="loginScreen" class="admin-login">
         <div class="login-card">
-            <h1>🧁 Panel Admin</h1>
-            <p>Manolo's Bakery</p>
+            <span class="login-logo">🧁</span>
+            <h1>Colección Ejecutiva</h1>
+            <p class="login-subtitle">Manolo's Bakery — Gestión del Catálogo</p>
             <div class="form-group">
-                <label for="adminPassword">Contraseña:</label>
+                <label for="adminPassword">Contraseña</label>
                 <input type="password" id="adminPassword" placeholder="Ingresa la contraseña" autofocus>
             </div>
-            <button id="loginBtn" class="btn-primary">Ingresar</button>
+            <button id="loginBtn" class="btn-primary" style="width:100%;">Ingresar</button>
             <div id="loginError" class="login-error" style="display:none;">Contraseña incorrecta</div>
         </div>
     </div>
 
     <!-- ========== DASHBOARD ========== -->
     <div id="dashboard" class="admin-dashboard" style="display:none;">
+
         <header class="admin-header">
             <div class="admin-header-left">
-                <h1>🧁 Admin Panel</h1>
-                <span class="admin-subtitle">Gestión de Pasteles</span>
+                <h1>🧁 Colección Ejecutiva</h1>
+                <span class="admin-subtitle">Manolo's Bakery — Gestión de Pasteles</span>
             </div>
-            <button id="logoutBtn" class="btn-secondary">Cerrar Sesión</button>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="sync-badge">En línea</span>
+                <button id="logoutBtn" class="btn-secondary">Cerrar Sesión</button>
+            </div>
         </header>
 
         <div class="admin-layout">
+
             <!-- SIDEBAR -->
             <nav class="admin-sidebar">
                 <button class="sidebar-btn active" data-section="sec-showcase-cakes">
-                    <span class="sidebar-icon">🎂</span> Pasteles Vitrina
+                    <span class="sidebar-icon">🎂</span>
+                    <span>Pasteles Vitrina</span>
+                    <span class="sidebar-count" id="count-showcase-cakes">0</span>
                 </button>
                 <button class="sidebar-btn" data-section="sec-showcase-sizes">
-                    <span class="sidebar-icon">📐</span> Tamaños Vitrina
+                    <span class="sidebar-icon">🍥</span>
+                    <span>Tamaños Vitrina</span>
+                    <span class="sidebar-count" id="count-showcase-sizes">0</span>
                 </button>
                 <button class="sidebar-btn" data-section="sec-custom-types">
-                    <span class="sidebar-icon">🍰</span> Sabores Personalizado
+                    <span class="sidebar-icon">🍰</span>
+                    <span>Sabores</span>
+                    <span class="sidebar-count" id="count-custom-types">0</span>
                 </button>
                 <button class="sidebar-btn" data-section="sec-custom-sizes">
-                    <span class="sidebar-icon">📏</span> Tamaños Personalizado
+                    <span class="sidebar-icon">🥧</span>
+                    <span>Tamaños Personalizado</span>
+                    <span class="sidebar-count" id="count-custom-sizes">0</span>
                 </button>
                 <button class="sidebar-btn" data-section="sec-fillings">
-                    <span class="sidebar-icon">🍫</span> Rellenos
+                    <span class="sidebar-icon">🍫</span>
+                    <span>Rellenos</span>
+                    <span class="sidebar-count" id="count-fillings">0</span>
                 </button>
                 <button class="sidebar-btn" data-section="sec-layers">
-                    <span class="sidebar-icon">📚</span> Capas
+                    <span class="sidebar-icon">🥞</span>
+                    <span>Capas</span>
+                    <span class="sidebar-count" id="count-layers">0</span>
                 </button>
             </nav>
 
@@ -61,17 +79,37 @@
 
                 <!-- ===== PASTELES VITRINA ===== -->
                 <section id="sec-showcase-cakes" class="admin-section active">
-                    <h2>Pasteles de Vitrina</h2>
-                    <p class="section-desc">Gestiona los pasteles disponibles en la pestaña "Pastel de Vitrina".</p>
+                    <div class="section-header">
+                        <h2><span class="section-icon">🎂</span> Pasteles de Vitrina</h2>
+                        <p class="section-desc">Gestiona los pasteles disponibles en la pestaña "Pastel de Vitrina".</p>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon gold">🎂</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="stat-sc-cakes">0</div>
+                                <div class="stat-label">Pasteles</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon teal">📌</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="stat-sc-fixed">0</div>
+                                <div class="stat-label">Tamaño Fijo</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="add-form">
+                        <div class="add-form-title">➕ Agregar Pastel</div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="sc-name">Nombre del pastel:</label>
+                                <label for="sc-name">Nombre del pastel</label>
                                 <input type="text" id="sc-name" placeholder="Ej: Pastel de Nutella">
                             </div>
                             <div class="form-group">
-                                <label for="sc-fixed-size">Tamaño fijo (opcional):</label>
+                                <label for="sc-fixed-size">Tamaño fijo</label>
                                 <select id="sc-fixed-size">
                                     <option value="">Sin tamaño fijo (usuario elige)</option>
                                     <option value="6">Solo 6"</option>
@@ -88,32 +126,48 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Nombre</th>
                                     <th>Value</th>
                                     <th>Tamaño Fijo</th>
-                                    <th>Acciones</th>
+                                    <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="showcaseCakesTable"></tbody>
                         </table>
-                        <div id="showcaseCakesEmpty" class="empty-msg">No hay pasteles registrados.</div>
+                        <div id="showcaseCakesEmpty" class="empty-msg">
+                            <span class="empty-icon">🎂</span>No hay pasteles registrados.
+                        </div>
                     </div>
                 </section>
 
                 <!-- ===== TAMAÑOS VITRINA ===== -->
                 <section id="sec-showcase-sizes" class="admin-section">
-                    <h2>Tamaños de Vitrina</h2>
-                    <p class="section-desc">Gestiona las opciones de tamaño del dropdown de vitrina.</p>
+                    <div class="section-header">
+                        <h2><span class="section-icon">🍥</span> Tamaños de Vitrina</h2>
+                        <p class="section-desc">Gestiona las opciones de tamaño del dropdown de vitrina.</p>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon teal">🍥</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="stat-sc-sizes">0</div>
+                                <div class="stat-label">Tamaños</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="add-form">
+                        <div class="add-form-title">➕ Agregar Tamaño</div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="ss-value">Value:</label>
+                                <label for="ss-value">Value</label>
                                 <input type="text" id="ss-value" placeholder="Ej: 6">
                             </div>
                             <div class="form-group">
-                                <label for="ss-label">Etiqueta:</label>
-                                <input type="text" id="ss-label" placeholder="Ej: 6&quot;">
+                                <label for="ss-label">Etiqueta</label>
+                                <input type="text" id="ss-label" placeholder='Ej: 6"'>
                             </div>
                             <button id="addShowcaseSize" class="btn-primary btn-add">+ Agregar</button>
                         </div>
@@ -123,26 +177,42 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Etiqueta</th>
                                     <th>Value</th>
-                                    <th>Acciones</th>
+                                    <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="showcaseSizesTable"></tbody>
                         </table>
-                        <div id="showcaseSizesEmpty" class="empty-msg">No hay tamaños registrados.</div>
+                        <div id="showcaseSizesEmpty" class="empty-msg">
+                            <span class="empty-icon">🍥</span>No hay tamaños registrados.
+                        </div>
                     </div>
                 </section>
 
                 <!-- ===== SABORES PERSONALIZADO ===== -->
                 <section id="sec-custom-types" class="admin-section">
-                    <h2>Sabores (Tipos de Pastel Personalizado)</h2>
-                    <p class="section-desc">Gestiona los tipos de pastel en la pestaña "Pastel Personalizado".</p>
+                    <div class="section-header">
+                        <h2><span class="section-icon">🍰</span> Sabores (Personalizado)</h2>
+                        <p class="section-desc">Gestiona los tipos de pastel en la pestaña "Pastel Personalizado".</p>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon gold">🍰</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="stat-ct-types">0</div>
+                                <div class="stat-label">Sabores</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="add-form">
+                        <div class="add-form-title">➕ Agregar Sabor</div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="ct-name">Nombre:</label>
+                                <label for="ct-name">Nombre</label>
                                 <input type="text" id="ct-name" placeholder="Ej: Tres Leches / Vainilla">
                             </div>
                             <button id="addCustomType" class="btn-primary btn-add">+ Agregar</button>
@@ -153,27 +223,43 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Nombre</th>
                                     <th>Value</th>
-                                    <th>Acciones</th>
+                                    <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="customTypesTable"></tbody>
                         </table>
-                        <div id="customTypesEmpty" class="empty-msg">No hay sabores registrados.</div>
+                        <div id="customTypesEmpty" class="empty-msg">
+                            <span class="empty-icon">🍰</span>No hay sabores registrados.
+                        </div>
                     </div>
                 </section>
 
                 <!-- ===== TAMAÑOS PERSONALIZADO ===== -->
                 <section id="sec-custom-sizes" class="admin-section">
-                    <h2>Forma y Tamaño (Personalizado)</h2>
-                    <p class="section-desc">Gestiona las opciones de forma y tamaño del pastel personalizado.</p>
+                    <div class="section-header">
+                        <h2><span class="section-icon">🥧</span> Forma y Tamaño (Personalizado)</h2>
+                        <p class="section-desc">Gestiona las opciones de forma y tamaño del pastel personalizado.</p>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon teal">🥧</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="stat-cs-sizes">0</div>
+                                <div class="stat-label">Tamaños</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="add-form">
+                        <div class="add-form-title">➕ Agregar Tamaño</div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="cs-label">Etiqueta:</label>
-                                <input type="text" id="cs-label" placeholder="Ej: Circular 8&quot;">
+                                <label for="cs-label">Etiqueta</label>
+                                <input type="text" id="cs-label" placeholder='Ej: Circular 8"'>
                             </div>
                             <button id="addCustomSize" class="btn-primary btn-add">+ Agregar</button>
                         </div>
@@ -183,26 +269,42 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Etiqueta</th>
                                     <th>Value</th>
-                                    <th>Acciones</th>
+                                    <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="customSizesTable"></tbody>
                         </table>
-                        <div id="customSizesEmpty" class="empty-msg">No hay tamaños registrados.</div>
+                        <div id="customSizesEmpty" class="empty-msg">
+                            <span class="empty-icon">🥧</span>No hay tamaños registrados.
+                        </div>
                     </div>
                 </section>
 
                 <!-- ===== RELLENOS ===== -->
                 <section id="sec-fillings" class="admin-section">
-                    <h2>Rellenos</h2>
-                    <p class="section-desc">Gestiona los rellenos disponibles para pasteles personalizados.</p>
+                    <div class="section-header">
+                        <h2><span class="section-icon">🍫</span> Rellenos</h2>
+                        <p class="section-desc">Gestiona los rellenos disponibles para pasteles personalizados.</p>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon coral">🍫</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="stat-fl-fillings">0</div>
+                                <div class="stat-label">Rellenos</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="add-form">
+                        <div class="add-form-title">➕ Agregar Relleno</div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="fl-name">Nombre:</label>
+                                <label for="fl-name">Nombre</label>
                                 <input type="text" id="fl-name" placeholder="Ej: Nutella">
                             </div>
                             <button id="addFilling" class="btn-primary btn-add">+ Agregar</button>
@@ -213,30 +315,46 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Nombre</th>
                                     <th>Value</th>
-                                    <th>Acciones</th>
+                                    <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="fillingsTable"></tbody>
                         </table>
-                        <div id="fillingsEmpty" class="empty-msg">No hay rellenos registrados.</div>
+                        <div id="fillingsEmpty" class="empty-msg">
+                            <span class="empty-icon">🍫</span>No hay rellenos registrados.
+                        </div>
                     </div>
                 </section>
 
                 <!-- ===== CAPAS ===== -->
                 <section id="sec-layers" class="admin-section">
-                    <h2>Capas del Pastel</h2>
-                    <p class="section-desc">Gestiona las opciones de capas para pasteles personalizados.</p>
+                    <div class="section-header">
+                        <h2><span class="section-icon">🥞</span> Capas del Pastel</h2>
+                        <p class="section-desc">Gestiona las opciones de capas para pasteles personalizados.</p>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon grey">🥞</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="stat-ly-layers">0</div>
+                                <div class="stat-label">Capas</div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="add-form">
+                        <div class="add-form-title">➕ Agregar Capa</div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="ly-value">Value (número):</label>
+                                <label for="ly-value">Value (número)</label>
                                 <input type="text" id="ly-value" placeholder="Ej: 4">
                             </div>
                             <div class="form-group">
-                                <label for="ly-label">Etiqueta:</label>
+                                <label for="ly-label">Etiqueta</label>
                                 <input type="text" id="ly-label" placeholder="Ej: 4">
                             </div>
                             <button id="addLayer" class="btn-primary btn-add">+ Agregar</button>
@@ -247,18 +365,37 @@
                         <table class="admin-table">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Etiqueta</th>
                                     <th>Value</th>
-                                    <th>Acciones</th>
+                                    <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="layersTable"></tbody>
                         </table>
-                        <div id="layersEmpty" class="empty-msg">No hay capas registradas.</div>
+                        <div id="layersEmpty" class="empty-msg">
+                            <span class="empty-icon">🥞</span>No hay capas registradas.
+                        </div>
                     </div>
                 </section>
 
             </main>
+        </div>
+    </div>
+
+    <!-- ========== TOAST CONTAINER ========== -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ========== CONFIRM MODAL ========== -->
+    <div id="confirmModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-icon">⚠️</div>
+            <h3 id="confirmTitle">¿Eliminar elemento?</h3>
+            <p id="confirmMessage">Esta acción no se puede deshacer.</p>
+            <div class="modal-actions">
+                <button id="confirmCancel" class="btn-cancel">Cancelar</button>
+                <button id="confirmOk" class="btn-confirm-delete">Eliminar</button>
+            </div>
         </div>
     </div>
 
