@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Manolo's Bakery</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- ========== LOGIN SCREEN ========== -->
+    <div id="loginScreen" class="admin-login">
+        <div class="login-card">
+            <h1>🧁 Panel Admin</h1>
+            <p>Manolo's Bakery</p>
+            <div class="form-group">
+                <label for="adminPassword">Contraseña:</label>
+                <input type="password" id="adminPassword" placeholder="Ingresa la contraseña" autofocus>
+            </div>
+            <button id="loginBtn" class="btn-primary">Ingresar</button>
+            <div id="loginError" class="login-error" style="display:none;">Contraseña incorrecta</div>
+        </div>
+    </div>
+
+    <!-- ========== DASHBOARD ========== -->
+    <div id="dashboard" class="admin-dashboard" style="display:none;">
+        <header class="admin-header">
+            <div class="admin-header-left">
+                <h1>🧁 Admin Panel</h1>
+                <span class="admin-subtitle">Gestión de Pasteles</span>
+            </div>
+            <button id="logoutBtn" class="btn-secondary">Cerrar Sesión</button>
+        </header>
+
+        <div class="admin-layout">
+            <!-- SIDEBAR -->
+            <nav class="admin-sidebar">
+                <button class="sidebar-btn active" data-section="sec-showcase-cakes">
+                    <span class="sidebar-icon">🎂</span> Pasteles Vitrina
+                </button>
+                <button class="sidebar-btn" data-section="sec-showcase-sizes">
+                    <span class="sidebar-icon">📐</span> Tamaños Vitrina
+                </button>
+                <button class="sidebar-btn" data-section="sec-custom-types">
+                    <span class="sidebar-icon">🍰</span> Sabores Personalizado
+                </button>
+                <button class="sidebar-btn" data-section="sec-custom-sizes">
+                    <span class="sidebar-icon">📏</span> Tamaños Personalizado
+                </button>
+                <button class="sidebar-btn" data-section="sec-fillings">
+                    <span class="sidebar-icon">🍫</span> Rellenos
+                </button>
+                <button class="sidebar-btn" data-section="sec-layers">
+                    <span class="sidebar-icon">📚</span> Capas
+                </button>
+            </nav>
+
+            <!-- MAIN CONTENT -->
+            <main class="admin-main">
+
+                <!-- ===== PASTELES VITRINA ===== -->
+                <section id="sec-showcase-cakes" class="admin-section active">
+                    <h2>Pasteles de Vitrina</h2>
+                    <p class="section-desc">Gestiona los pasteles disponibles en la pestaña "Pastel de Vitrina".</p>
+
+                    <div class="add-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sc-name">Nombre del pastel:</label>
+                                <input type="text" id="sc-name" placeholder="Ej: Pastel de Nutella">
+                            </div>
+                            <div class="form-group">
+                                <label for="sc-fixed-size">Tamaño fijo (opcional):</label>
+                                <select id="sc-fixed-size">
+                                    <option value="">Sin tamaño fijo (usuario elige)</option>
+                                    <option value="6">Solo 6"</option>
+                                    <option value="8">Solo 8"</option>
+                                    <option value="10">Solo 10"</option>
+                                    <option value="7_9.5">Solo 7" y 9.5"</option>
+                                </select>
+                            </div>
+                            <button id="addShowcaseCake" class="btn-primary btn-add">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Value</th>
+                                    <th>Tamaño Fijo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="showcaseCakesTable"></tbody>
+                        </table>
+                        <div id="showcaseCakesEmpty" class="empty-msg">No hay pasteles registrados.</div>
+                    </div>
+                </section>
+
+                <!-- ===== TAMAÑOS VITRINA ===== -->
+                <section id="sec-showcase-sizes" class="admin-section">
+                    <h2>Tamaños de Vitrina</h2>
+                    <p class="section-desc">Gestiona las opciones de tamaño del dropdown de vitrina.</p>
+
+                    <div class="add-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ss-value">Value:</label>
+                                <input type="text" id="ss-value" placeholder="Ej: 6">
+                            </div>
+                            <div class="form-group">
+                                <label for="ss-label">Etiqueta:</label>
+                                <input type="text" id="ss-label" placeholder="Ej: 6&quot;">
+                            </div>
+                            <button id="addShowcaseSize" class="btn-primary btn-add">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Etiqueta</th>
+                                    <th>Value</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="showcaseSizesTable"></tbody>
+                        </table>
+                        <div id="showcaseSizesEmpty" class="empty-msg">No hay tamaños registrados.</div>
+                    </div>
+                </section>
+
+                <!-- ===== SABORES PERSONALIZADO ===== -->
+                <section id="sec-custom-types" class="admin-section">
+                    <h2>Sabores (Tipos de Pastel Personalizado)</h2>
+                    <p class="section-desc">Gestiona los tipos de pastel en la pestaña "Pastel Personalizado".</p>
+
+                    <div class="add-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ct-name">Nombre:</label>
+                                <input type="text" id="ct-name" placeholder="Ej: Tres Leches / Vainilla">
+                            </div>
+                            <button id="addCustomType" class="btn-primary btn-add">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Value</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customTypesTable"></tbody>
+                        </table>
+                        <div id="customTypesEmpty" class="empty-msg">No hay sabores registrados.</div>
+                    </div>
+                </section>
+
+                <!-- ===== TAMAÑOS PERSONALIZADO ===== -->
+                <section id="sec-custom-sizes" class="admin-section">
+                    <h2>Forma y Tamaño (Personalizado)</h2>
+                    <p class="section-desc">Gestiona las opciones de forma y tamaño del pastel personalizado.</p>
+
+                    <div class="add-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cs-label">Etiqueta:</label>
+                                <input type="text" id="cs-label" placeholder="Ej: Circular 8&quot;">
+                            </div>
+                            <button id="addCustomSize" class="btn-primary btn-add">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Etiqueta</th>
+                                    <th>Value</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customSizesTable"></tbody>
+                        </table>
+                        <div id="customSizesEmpty" class="empty-msg">No hay tamaños registrados.</div>
+                    </div>
+                </section>
+
+                <!-- ===== RELLENOS ===== -->
+                <section id="sec-fillings" class="admin-section">
+                    <h2>Rellenos</h2>
+                    <p class="section-desc">Gestiona los rellenos disponibles para pasteles personalizados.</p>
+
+                    <div class="add-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fl-name">Nombre:</label>
+                                <input type="text" id="fl-name" placeholder="Ej: Nutella">
+                            </div>
+                            <button id="addFilling" class="btn-primary btn-add">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Value</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fillingsTable"></tbody>
+                        </table>
+                        <div id="fillingsEmpty" class="empty-msg">No hay rellenos registrados.</div>
+                    </div>
+                </section>
+
+                <!-- ===== CAPAS ===== -->
+                <section id="sec-layers" class="admin-section">
+                    <h2>Capas del Pastel</h2>
+                    <p class="section-desc">Gestiona las opciones de capas para pasteles personalizados.</p>
+
+                    <div class="add-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ly-value">Value (número):</label>
+                                <input type="text" id="ly-value" placeholder="Ej: 4">
+                            </div>
+                            <div class="form-group">
+                                <label for="ly-label">Etiqueta:</label>
+                                <input type="text" id="ly-label" placeholder="Ej: 4">
+                            </div>
+                            <button id="addLayer" class="btn-primary btn-add">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Etiqueta</th>
+                                    <th>Value</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="layersTable"></tbody>
+                        </table>
+                        <div id="layersEmpty" class="empty-msg">No hay capas registradas.</div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
