@@ -800,13 +800,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Logic for Fillings Selection ---
+    // IMPORTANTE: usa delegación de eventos sobre el contenedor, porque
+    // loadCakeConfig() reconstruye los checkboxes dinámicamente (y eso
+    // "mata" los listeners puestos a mano). La delegación sobrevive al rebuild.
     let updateSelectedFillingsDisplay = null; // hoist para usar en translatePage
 
     if (fillingsCheckboxesContainer) {
-        const checkboxes = fillingsCheckboxesContainer.querySelectorAll('input[type="checkbox"]');
-
         updateSelectedFillingsDisplay = function () {
-            const selected = Array.from(checkboxes)
+            const selected = Array.from(fillingsCheckboxesContainer.querySelectorAll('input[type="checkbox"]'))
                 .filter(cb => cb.checked)
                 .map(cb => {
                     const label = document.querySelector(`label[for="${cb.id}"]`);
@@ -848,8 +849,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', handleFillingSelectionChange);
+        // Delegación: un solo listener en el contenedor que sobrevive a los rebuilds
+        fillingsCheckboxesContainer.addEventListener('change', function (e) {
+            if (e.target && e.target.type === 'checkbox' && e.target.name === 'customFilling') {
+                handleFillingSelectionChange();
+            }
         });
 
         // Manejo de radios
