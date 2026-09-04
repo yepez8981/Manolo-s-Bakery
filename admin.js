@@ -1,9 +1,3 @@
-/**
- * admin.js — Panel de administración Manolo's Bakery
- * Gestiona pasteles de vitrina, personalizado, rellenos y capas.
- * Persiste en localStorage con prefijo "manolos_".
- */
-
 (function () {
     'use strict';
 
@@ -22,7 +16,7 @@
         layers:          STORAGE_PREFIX + 'admin_layers'
     };
 
-    /* Defaults iniciales (se usan la primera vez) */
+    /* Defaults iniciales */
     var DEFAULTS = {
         showcaseCakes: [
             { value: 'churros_tres_leches', name: 'Pastel Churros Tres Leches', fixedSize: '' },
@@ -115,8 +109,12 @@
         pushAllToServer();
     }
 
+    function saveToLocalOnly(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+
     /* =========================================================
-       SERVER SYNC (guardar config en la hoja de Google)
+       SERVER SYNC
     ========================================================= */
     var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxr0_krlnTJOid509YzSllhnKhNUYigmelcTK6fReMvMTM5L6XVUU3UqMmp-kQpvyI-/exec';
 
@@ -142,16 +140,38 @@
         })
         .then(function (r) { return r.json(); })
         .then(function (data) {
-            if (!data || data.status !== 'success') {
-                console.log('Admin sync falló:', data);
+            if (data && data.status === 'success') {
+                toast('Sincronizado con el servidor', 'success');
+            } else {
+                toast('Error al sincronizar', 'error');
             }
         })
-        .catch(function (err) {
-            console.log('Admin sync error:', err);
+        .catch(function () {
+            toast('Sin conexión — guardado local', 'info');
         });
     }
 
-    /* reverse map: storage key → DEFAULTS short key */
+    function syncFromServer() {
+        fetch(SCRIPT_URL + '?action=getConfig', { method: 'GET' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.status === 'success' && data.config) {
+                    Object.keys(KEYS).forEach(function (k) {
+                        var list = data.config[k];
+                        if (Array.isArray(list)) {
+                            saveToLocalOnly(KEYS[k], list);
+                        }
+                    });
+                    renderAllTables();
+                    toast('Config cargada del servidor', 'success');
+                }
+            })
+            .catch(function () { });
+    }
+
+    /* =========================================================
+       REVERSE MAP & getData
+    ========================================================= */
     var SHORT_KEYS = {};
     Object.keys(KEYS).forEach(function (k) { SHORT_KEYS[KEYS[k]] = k; });
 
@@ -166,7 +186,7 @@
     }
 
     /* =========================================================
-       SLUGIFY — genera value a partir del nombre
+       SLUGIFY
     ========================================================= */
     function slugify(text) {
         return String(text)
@@ -180,13 +200,98 @@
        DOM HELPERS
     ========================================================= */
     function $(id) { return document.getElementById(id); }
-    function qs(sel) { return document.querySelector(sel); }
     function qsa(sel) { return document.querySelectorAll(sel); }
 
     function escapeHtml(str) {
         var div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    /* =========================================================
+       TOAST NOTIFICATIONS
+    ========================================================= */
+    function toast(message, type) {
+        type = type || 'info';
+        var container = $('toastContainer');
+        if (!container) return;
+
+        var el = document.createElement('div');
+        el.className = 'toast toast-' + type;
+        el.textContent = message;
+        container.appendChild(el);
+
+        setTimeout(function () {
+            el.classList.add('toast-exit');
+            setTimeout(function () { el.remove(); }, 300);
+        }, 3000);
+    }
+
+    /* =========================================================
+       CONFIRM MODAL
+    ========================================================= */
+    function confirmAction(title, message) {
+        return new Promise(function (resolve) {
+            var overlay = $('confirmModal');
+            var titleEl = $('confirmTitle');
+            var msgEl = $('confirmMessage');
+            var okBtn = $('confirmOk');
+            var cancelBtn = $('confirmCancel');
+
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            overlay.style.display = 'flex';
+
+            function close(result) {
+                overlay.style.display = 'none';
+                okBtn.removeEventListener('click', onOk);
+                cancelBtn.removeEventListener('click', onCancel);
+                overlay.removeEventListener('click', onBg);
+                resolve(result);
+            }
+
+            function onOk() { close(true); }
+            function onCancel() { close(false); }
+            function onBg(e) { if (e.target === overlay) close(false); }
+
+            okBtn.addEventListener('click', onOk);
+            cancelBtn.addEventListener('click', onCancel);
+            overlay.addEventListener('click', onBg);
+        });
+    }
+
+    /* =========================================================
+       UPDATE STATS & COUNTS
+    ========================================================= */
+    function updateStats() {
+        var scCakes = getData(KEYS.showcaseCakes);
+        var scSizes = getData(KEYS.showcaseSizes);
+        var ctTypes = getData(KEYS.customTypes);
+        var csSizes = getData(KEYS.customSizes);
+        var fl = getData(KEYS.fillings);
+        var ly = getData(KEYS.layers);
+
+        /* Sidebar counts */
+        setText('count-showcase-cakes', scCakes.length);
+        setText('count-showcase-sizes', scSizes.length);
+        setText('count-custom-types', ctTypes.length);
+        setText('count-custom-sizes', csSizes.length);
+        setText('count-fillings', fl.length);
+        setText('count-layers', ly.length);
+
+        /* Stat cards */
+        setText('stat-sc-cakes', scCakes.length);
+        setText('stat-sc-fixed', scCakes.filter(function (c) { return c.fixedSize; }).length);
+        setText('stat-sc-sizes', scSizes.length);
+        setText('stat-ct-types', ctTypes.length);
+        setText('stat-cs-sizes', csSizes.length);
+        setText('stat-fl-fillings', fl.length);
+        setText('stat-ly-layers', ly.length);
+    }
+
+    function setText(id, val) {
+        var el = $(id);
+        if (el) el.textContent = val;
     }
 
     /* =========================================================
@@ -227,30 +332,8 @@
         syncFromServer();
     }
 
-    /* Load config from the server into localStorage, then re-render. */
-    function syncFromServer() {
-        fetch(SCRIPT_URL + '?action=getConfig', { method: 'GET' })
-            .then(function (r) { return r.json(); })
-            .then(function (data) {
-                if (data && data.status === 'success' && data.config) {
-                    Object.keys(KEYS).forEach(function (k) {
-                        var list = data.config[k];
-                        if (Array.isArray(list)) {
-                            saveToLocalOnly(KEYS[k], list);
-                        }
-                    });
-                    renderAllTables();
-                }
-            })
-            .catch(function () { /* queda lo loca */ });
-    }
-
-    function saveToLocalOnly(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
-    }
-
     /* =========================================================
-       SIDEBAR NAVIGATION
+       SIDEBAR
     ========================================================= */
     function initSidebar() {
         var buttons = qsa('.sidebar-btn');
@@ -278,9 +361,9 @@
         renderCustomSizes();
         renderFillings();
         renderLayers();
+        updateStats();
     }
 
-    /* --- Showcase Cakes --- */
     function renderShowcaseCakes() {
         var data = getData(KEYS.showcaseCakes);
         var tbody = $('showcaseCakesTable');
@@ -295,9 +378,10 @@
 
         tbody.innerHTML = data.map(function (item, i) {
             return '<tr>' +
-                '<td>' + escapeHtml(item.name) + '</td>' +
+                '<td><span class="item-number">' + (i + 1) + '</span></td>' +
+                '<td><strong>' + escapeHtml(item.name) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
-                '<td>' + escapeHtml(item.fixedSize || '—') + '</td>' +
+                '<td>' + (item.fixedSize ? '<strong>' + escapeHtml(item.fixedSize) + '</strong>' : '<span style="color:var(--contrast-3)">—</span>') + '</td>' +
                 '<td class="col-actions">' +
                     '<button class="btn-danger" data-action="delete" data-cat="showcaseCakes" data-idx="' + i + '">Eliminar</button>' +
                 '</td>' +
@@ -305,7 +389,6 @@
         }).join('');
     }
 
-    /* --- Showcase Sizes --- */
     function renderShowcaseSizes() {
         var data = getData(KEYS.showcaseSizes);
         var tbody = $('showcaseSizesTable');
@@ -320,7 +403,8 @@
 
         tbody.innerHTML = data.map(function (item, i) {
             return '<tr>' +
-                '<td>' + escapeHtml(item.label) + '</td>' +
+                '<td><span class="item-number">' + (i + 1) + '</span></td>' +
+                '<td><strong>' + escapeHtml(item.label) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
                     '<button class="btn-danger" data-action="delete" data-cat="showcaseSizes" data-idx="' + i + '">Eliminar</button>' +
@@ -329,7 +413,6 @@
         }).join('');
     }
 
-    /* --- Custom Types --- */
     function renderCustomTypes() {
         var data = getData(KEYS.customTypes);
         var tbody = $('customTypesTable');
@@ -344,7 +427,8 @@
 
         tbody.innerHTML = data.map(function (item, i) {
             return '<tr>' +
-                '<td>' + escapeHtml(item.name) + '</td>' +
+                '<td><span class="item-number">' + (i + 1) + '</span></td>' +
+                '<td><strong>' + escapeHtml(item.name) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
                     '<button class="btn-danger" data-action="delete" data-cat="customTypes" data-idx="' + i + '">Eliminar</button>' +
@@ -353,7 +437,6 @@
         }).join('');
     }
 
-    /* --- Custom Sizes --- */
     function renderCustomSizes() {
         var data = getData(KEYS.customSizes);
         var tbody = $('customSizesTable');
@@ -368,7 +451,8 @@
 
         tbody.innerHTML = data.map(function (item, i) {
             return '<tr>' +
-                '<td>' + escapeHtml(item.label) + '</td>' +
+                '<td><span class="item-number">' + (i + 1) + '</span></td>' +
+                '<td><strong>' + escapeHtml(item.label) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
                     '<button class="btn-danger" data-action="delete" data-cat="customSizes" data-idx="' + i + '">Eliminar</button>' +
@@ -377,7 +461,6 @@
         }).join('');
     }
 
-    /* --- Fillings --- */
     function renderFillings() {
         var data = getData(KEYS.fillings);
         var tbody = $('fillingsTable');
@@ -392,7 +475,8 @@
 
         tbody.innerHTML = data.map(function (item, i) {
             return '<tr>' +
-                '<td>' + escapeHtml(item.name) + '</td>' +
+                '<td><span class="item-number">' + (i + 1) + '</span></td>' +
+                '<td><strong>' + escapeHtml(item.name) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
                     '<button class="btn-danger" data-action="delete" data-cat="fillings" data-idx="' + i + '">Eliminar</button>' +
@@ -401,7 +485,6 @@
         }).join('');
     }
 
-    /* --- Layers --- */
     function renderLayers() {
         var data = getData(KEYS.layers);
         var tbody = $('layersTable');
@@ -416,7 +499,8 @@
 
         tbody.innerHTML = data.map(function (item, i) {
             return '<tr>' +
-                '<td>' + escapeHtml(item.label) + '</td>' +
+                '<td><span class="item-number">' + (i + 1) + '</span></td>' +
+                '<td><strong>' + escapeHtml(item.label) + '</strong></td>' +
                 '<td><code>' + escapeHtml(item.value) + '</code></td>' +
                 '<td class="col-actions">' +
                     '<button class="btn-danger" data-action="delete" data-cat="layers" data-idx="' + i + '">Eliminar</button>' +
@@ -429,18 +513,16 @@
        ADD ACTIONS
     ========================================================= */
     function initAddButtons() {
-        /* Showcase Cakes */
         $('addShowcaseCake').addEventListener('click', function () {
             var name = $('sc-name').value.trim();
             var fixedSize = $('sc-fixed-size').value;
-            if (!name) { alert('Escribe el nombre del pastel'); return; }
+            if (!name) { toast('Escribe el nombre del pastel', 'error'); $('sc-name').focus(); return; }
 
             var data = getData(KEYS.showcaseCakes);
             var value = slugify(name);
 
-            /* Evitar duplicados */
             if (data.some(function (d) { return d.value === value; })) {
-                alert('Ya existe un pastel con ese nombre'); return;
+                toast('Ya existe un pastel con ese nombre', 'error'); return;
             }
 
             data.push({ value: value, name: name, fixedSize: fixedSize });
@@ -448,17 +530,18 @@
             $('sc-name').value = '';
             $('sc-fixed-size').value = '';
             renderShowcaseCakes();
+            updateStats();
+            toast('Pastel agregado', 'success');
         });
 
-        /* Showcase Sizes */
         $('addShowcaseSize').addEventListener('click', function () {
             var val = $('ss-value').value.trim();
             var lbl = $('ss-label').value.trim();
-            if (!val || !lbl) { alert('Completa value y etiqueta'); return; }
+            if (!val || !lbl) { toast('Completa value y etiqueta', 'error'); return; }
 
             var data = getData(KEYS.showcaseSizes);
             if (data.some(function (d) { return d.value === val; })) {
-                alert('Ya existe un tamaño con ese value'); return;
+                toast('Ya existe un tamaño con ese value', 'error'); return;
             }
 
             data.push({ value: val, label: lbl });
@@ -466,71 +549,75 @@
             $('ss-value').value = '';
             $('ss-label').value = '';
             renderShowcaseSizes();
+            updateStats();
+            toast('Tamaño agregado', 'success');
         });
 
-        /* Custom Types */
         $('addCustomType').addEventListener('click', function () {
             var name = $('ct-name').value.trim();
-            if (!name) { alert('Escribe el nombre del sabor'); return; }
+            if (!name) { toast('Escribe el nombre del sabor', 'error'); $('ct-name').focus(); return; }
 
             var data = getData(KEYS.customTypes);
             var value = slugify(name);
 
             if (data.some(function (d) { return d.value === value; })) {
-                alert('Ya existe un sabor con ese nombre'); return;
+                toast('Ya existe un sabor con ese nombre', 'error'); return;
             }
 
             data.push({ value: value, name: name });
             save(KEYS.customTypes, data);
             $('ct-name').value = '';
             renderCustomTypes();
+            updateStats();
+            toast('Sabor agregado', 'success');
         });
 
-        /* Custom Sizes */
         $('addCustomSize').addEventListener('click', function () {
             var lbl = $('cs-label').value.trim();
-            if (!lbl) { alert('Escribe la etiqueta del tamaño'); return; }
+            if (!lbl) { toast('Escribe la etiqueta del tamaño', 'error'); $('cs-label').focus(); return; }
 
             var data = getData(KEYS.customSizes);
             var value = slugify(lbl);
 
             if (data.some(function (d) { return d.value === value; })) {
-                alert('Ya existe un tamaño con ese nombre'); return;
+                toast('Ya existe un tamaño con ese nombre', 'error'); return;
             }
 
             data.push({ value: value, label: lbl });
             save(KEYS.customSizes, data);
             $('cs-label').value = '';
             renderCustomSizes();
+            updateStats();
+            toast('Tamaño agregado', 'success');
         });
 
-        /* Fillings */
         $('addFilling').addEventListener('click', function () {
             var name = $('fl-name').value.trim();
-            if (!name) { alert('Escribe el nombre del relleno'); return; }
+            if (!name) { toast('Escribe el nombre del relleno', 'error'); $('fl-name').focus(); return; }
 
             var data = getData(KEYS.fillings);
             var value = slugify(name);
 
             if (data.some(function (d) { return d.value === value; })) {
-                alert('Ya existe un relleno con ese nombre'); return;
+                toast('Ya existe un relleno con ese nombre', 'error'); return;
             }
 
             data.push({ value: value, name: name });
             save(KEYS.fillings, data);
             $('fl-name').value = '';
             renderFillings();
+            updateStats();
+            toast('Relleno agregado', 'success');
         });
 
-        /* Layers */
         $('addLayer').addEventListener('click', function () {
             var val = $('ly-value').value.trim();
             var lbl = $('ly-label').value.trim();
-            if (!val || !lbl) { alert('Completa value y etiqueta'); return; }
+            if (!val || !lbl) { toast('Completa value y etiqueta', 'error'); return; }
 
             var data = getData(KEYS.layers);
             if (data.some(function (d) { return d.value === val; })) {
-                alert('Ya existe una capa con ese value'); return;
+                toast('Ya existe una capa con ese value', 'error'); return;
             }
 
             data.push({ value: val, label: lbl });
@@ -538,11 +625,13 @@
             $('ly-value').value = '';
             $('ly-label').value = '';
             renderLayers();
+            updateStats();
+            toast('Capa agregada', 'success');
         });
     }
 
     /* =========================================================
-       DELETE ACTIONS (delegated)
+       DELETE ACTIONS (delegated, with confirm modal)
     ========================================================= */
     function initDeleteDelegation() {
         document.addEventListener('click', function (e) {
@@ -552,28 +641,33 @@
             var cat = btn.dataset.cat;
             var idx = parseInt(btn.dataset.idx, 10);
             var key = KEYS[cat];
-
             if (!key) return;
 
             var data = getData(key);
             var itemName = data[idx] ? (data[idx].name || data[idx].label || data[idx].value) : '';
 
-            if (!confirm('¿Eliminar "' + itemName + '"?')) return;
+            confirmAction(
+                '¿Eliminar "' + itemName + '"?',
+                'Esta acción no se puede deshacer.'
+            ).then(function (confirmed) {
+                if (!confirmed) return;
 
-            data.splice(idx, 1);
-            save(key, data);
+                data.splice(idx, 1);
+                save(key, data);
 
-            /* Re-render la tabla correspondiente */
-            var renderMap = {
-                showcaseCakes: renderShowcaseCakes,
-                showcaseSizes: renderShowcaseSizes,
-                customTypes: renderCustomTypes,
-                customSizes: renderCustomSizes,
-                fillings: renderFillings,
-                layers: renderLayers
-            };
+                var renderMap = {
+                    showcaseCakes: renderShowcaseCakes,
+                    showcaseSizes: renderShowcaseSizes,
+                    customTypes: renderCustomTypes,
+                    customSizes: renderCustomSizes,
+                    fillings: renderFillings,
+                    layers: renderLayers
+                };
 
-            if (renderMap[cat]) renderMap[cat]();
+                if (renderMap[cat]) renderMap[cat]();
+                updateStats();
+                toast('Eliminado correctamente', 'success');
+            });
         });
     }
 
