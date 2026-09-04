@@ -243,9 +243,14 @@
             titleEl.textContent = title;
             msgEl.textContent = message;
             overlay.style.display = 'flex';
+            overlay.style.opacity = '1';
+            overlay.style.visibility = 'visible';
+            overlay.style.pointerEvents = 'auto';
 
             function close(result) {
                 overlay.style.display = 'none';
+                overlay.style.opacity = '0';
+                overlay.style.visibility = 'hidden';
                 okBtn.removeEventListener('click', onOk);
                 cancelBtn.removeEventListener('click', onCancel);
                 overlay.removeEventListener('click', onBg);
