@@ -35,10 +35,185 @@ function showNotice(message, type, options) {
     return notice;
 }
 
+/* loadCakeConfig — rebuilds form dropdowns/checkboxes.
+   Source order: server config → localStorage → defaults (HTML). */
+function loadCakeConfig(serverConfig) {
+    var PREFIX = 'manolos_';
+    var KEYS = {
+        showcaseCakes: PREFIX + 'admin_showcase_cakes',
+        showcaseSizes:  PREFIX + 'admin_showcase_sizes',
+        customTypes:    PREFIX + 'admin_custom_types',
+        customSizes:    PREFIX + 'admin_custom_sizes',
+        fillings:       PREFIX + 'admin_fillings',
+        layers:         PREFIX + 'admin_layers'
+    };
+
+    function read(key) {
+        try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
+    }
+
+    function pick(serverKey, localKey) {
+        if (serverConfig && Array.isArray(serverConfig[serverKey]) && serverConfig[serverKey].length) {
+            return serverConfig[serverKey];
+        }
+        return read(localKey);
+    }
+
+    /* ---- Showcase cakes → #sc-cake-select ---- */
+    var cakes = pick('showcaseCakes', KEYS.showcaseCakes);
+    var scSelect = document.getElementById('sc-cake-select');
+    if (scSelect && Array.isArray(cakes) && cakes.length) {
+        var placeholder = scSelect.querySelector('option[value=""]');
+        scSelect.innerHTML = '';
+        if (placeholder) scSelect.appendChild(placeholder);
+        cakes.forEach(function (c) {
+            var o = document.createElement('option');
+            o.value = c.value;
+            o.textContent = c.name;
+            if (c.fixedSize) o.setAttribute('data-fixed-size', c.fixedSize);
+            scSelect.appendChild(o);
+        });
+    }
+
+    /* ---- Showcase sizes → #sc-cakeSize ---- */
+    var sizes = pick('showcaseSizes', KEYS.showcaseSizes);
+    var scSize = document.getElementById('sc-cakeSize');
+    if (scSize && Array.isArray(sizes) && sizes.length) {
+        var ph = scSize.querySelector('option[value=""]');
+        scSize.innerHTML = '';
+        if (ph) scSize.appendChild(ph);
+        sizes.forEach(function (s) {
+            var o = document.createElement('option');
+            o.value = s.value;
+            o.textContent = s.label;
+            scSize.appendChild(o);
+        });
+    }
+
+    /* ---- Custom types → #cc-cakeType (always keep "Otro") ---- */
+    var types = pick('customTypes', KEYS.customTypes);
+    var ccType = document.getElementById('cc-cakeType');
+    if (ccType && Array.isArray(types) && types.length) {
+        var ph2 = ccType.querySelector('option[value=""]');
+        ccType.innerHTML = '';
+        if (ph2) ccType.appendChild(ph2);
+        types.forEach(function (t) {
+            var o = document.createElement('option');
+            o.value = t.value;
+            o.textContent = t.name;
+            ccType.appendChild(o);
+        });
+        /* ensure "Otro" option exists */
+        if (!ccType.querySelector('option[value="otro"]')) {
+            var otro = document.createElement('option');
+            otro.value = 'otro';
+            otro.textContent = 'Otro';
+            ccType.appendChild(otro);
+        }
+    }
+
+    /* ---- Custom sizes → #cc-cakeSize ---- */
+    var cSizes = pick('customSizes', KEYS.customSizes);
+    var ccSize = document.getElementById('cc-cakeSize');
+    if (ccSize && Array.isArray(cSizes) && cSizes.length) {
+        var ph3 = ccSize.querySelector('option[value=""]');
+        ccSize.innerHTML = '';
+        if (ph3) ccSize.appendChild(ph3);
+        cSizes.forEach(function (s) {
+            var o = document.createElement('option');
+            o.value = s.value;
+            o.textContent = s.label;
+            ccSize.appendChild(o);
+        });
+    }
+
+    /* ---- Fillings → #cc-fillings-group (preserve "Otro" checkbox + container) ---- */
+    var fillings = pick('fillings', KEYS.fillings);
+    var fg = document.getElementById('cc-fillings-group');
+    if (fg && Array.isArray(fillings) && fillings.length) {
+        /* keep only #other-filling-container */
+        var otherContainer = document.getElementById('other-filling-container');
+        fg.innerHTML = '';
+        fillings.forEach(function (f) {
+            var wrap = document.createElement('div');
+            var cb  = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.id   = 'filling-' + f.value;
+            cb.name = 'customFilling';
+            cb.value = f.value;
+            var lbl = document.createElement('label');
+            lbl.setAttribute('for', cb.id);
+            lbl.textContent = f.name;
+            wrap.appendChild(cb);
+            wrap.appendChild(lbl);
+            fg.appendChild(wrap);
+        });
+        /* add "Otro" checkbox + hidden container */
+        var otherWrap = document.createElement('div');
+        var otherCb   = document.createElement('input');
+        otherCb.type = 'checkbox';
+        otherCb.id   = 'filling-other';
+        otherCb.name = 'customFilling';
+        otherCb.value = 'other';
+        var otherLbl = document.createElement('label');
+        otherLbl.setAttribute('for', 'filling-other');
+        otherLbl.textContent = 'Otro';
+        otherWrap.appendChild(otherCb);
+        otherWrap.appendChild(otherLbl);
+        fg.appendChild(otherWrap);
+        if (otherContainer) fg.appendChild(otherContainer);
+        else {
+            var OC = document.createElement('div');
+            OC.id = 'other-filling-container';
+            OC.style.cssText = 'display:none;margin-top:10px;';
+            var inp = document.createElement('input');
+            inp.type = 'text';
+            inp.id = 'other-filling-input';
+            inp.placeholder = 'Especifica otro relleno...';
+            inp.style.cssText = 'width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;';
+            OC.appendChild(inp);
+            fg.appendChild(OC);
+        }
+    }
+
+    /* ---- Layers → #cc-flavor ---- */
+    var layers = pick('layers', KEYS.layers);
+    var ccFlavor = document.getElementById('cc-flavor');
+    if (ccFlavor && Array.isArray(layers) && layers.length) {
+        var ph4 = ccFlavor.querySelector('option[disabled]');
+        ccFlavor.innerHTML = '';
+        if (ph4) ccFlavor.appendChild(ph4);
+        layers.forEach(function (l) {
+            var o = document.createElement('option');
+            o.value = l.value;
+            o.textContent = l.label;
+            ccFlavor.appendChild(o);
+        });
+    }
+}
+
+/* fetchServerConfig — loads config from Apps Script (global) and applies to form.
+   Falls back to localStorage + defaults if the server is unreachable. */
+function fetchServerConfig() {
+    var CONFIG_URL = 'https://script.google.com/macros/s/AKfycbxr0_krlnTJOid509YzSllhnKhNUYigmelcTK6fReMvMTM5L6XVUU3UqMmp-kQpvyI-/exec?action=getConfig';
+    try {
+        fetch(CONFIG_URL)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.status === 'success' && data.config) {
+                    loadCakeConfig(data.config);
+                }
+            })
+            .catch(function () { /* fallback a localStorage/defaults ya aplicado */ });
+    } catch (e) { /* fallback */ }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     window.__USE_PREVIEW_FLOW__ = true;
+    loadCakeConfig();
+    fetchServerConfig();
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFrFKoL6toXidqw4D9wYxmgaDtQjNbBtIP-NwIShCVrUJ05zZTjsSnesevkqf7bgw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxr0_krlnTJOid509YzSllhnKhNUYigmelcTK6fReMvMTM5L6XVUU3UqMmp-kQpvyI-/exec";
 
     const MANOLOS_WHATSAPP_E164_NO_PLUS = "19802878716"; // <-- AJUSTAR SI HAY CAMBIO DE NUMERO
     const MANOLOS_PHONE_E164_PLUS       = "+19802878716"; // <-- AJUSTAR SI HAY CAMBIO DE NUMERO
@@ -575,6 +750,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Helper to extract fixed size from cake option text
     function getFixedSizeFromOption(selectedOption) {
         if (!selectedOption || !selectedOption.text) return null;
+        var attr = selectedOption.getAttribute('data-fixed-size');
+        if (attr) return attr;
         const text = selectedOption.text.toLowerCase();
         if (text.includes('(solo 10")') || text.includes('(10" only)')) return "10";
         if (text.includes('(solo 7" y 9.5")') || text.includes('(7" & 9.5" only)')) return "7_9.5";
